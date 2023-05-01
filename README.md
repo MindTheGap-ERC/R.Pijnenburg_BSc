@@ -1,2 +1,2 @@
-# BSc_R.Pijnenburg
-BSc thesis of Robin Pijnenburg
+# Bachelors thesis of Robin Pijnenburg
+Initial repository so we can discuss the analysis.
