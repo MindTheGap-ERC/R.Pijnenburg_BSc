@@ -24,9 +24,9 @@ points on it can be objectively distinguished as homologous. Here I used
 ``` r
 geomorph::digitize2d(
   filelist="Trip1_ko213.jpg",
-  nlandmarks=5,
+  nlandmarks=15,
   scale = NULL,
-  tpsfile="top.tps",
+  tpsfile="top15.tps",
   MultScale = FALSE,
   verbose = TRUE
 )
@@ -87,7 +87,7 @@ points(x = top[,1,],
        pch = 16)
 ```
 
-![](GM_files/figure-commonmark/unnamed-chunk-3-1.png)
+![](GM_files/figure-commonmark/extract%20conodont%20outline-1.png)
 
 This gave us 2804 landmarks (need to find how to evaluate in-line
 expressions in Quarto). That might be too many. We need a comparable
@@ -96,14 +96,14 @@ reasonable number using the `runif` function that samples from a uniform
 distribution.
 
 ``` r
-Ko213_1_100 <- Ko213_1$Trip1_ko213_bw[runif(100,
+Ko213_1_100 <- Ko213_1$Trip1_ko213_bw[runif(300,
                                    min = 1,
                                    max = nrow(Ko213_1$Trip1_ko213_bw)),]
 
 plot(Ko213_1_100)
 ```
 
-![](GM_files/figure-commonmark/unnamed-chunk-4-1.png)
+![](GM_files/figure-commonmark/subsample%20from%20the%20outline-1.png)
 
 But these landmarks are not very well spaced. Maybe we need to get back
 to `geomorph` and use the function `define.sliders`. The problem with
@@ -112,3 +112,96 @@ good.](https://momx.github.io/Momocs/articles/Momocs_intro.html)
 
 But maybe we prefer to use Fourier transform instead? To be discussed
 with Robin, Twan, Przemek and Niklas.
+
+## Sliding landmarks in geomorph
+
+Here I digitize 12 landmarks, of which 5 are Type I.
+
+``` r
+ko <- list.files(pattern = "*.jpg")
+
+geomorph::digitize2d(
+  filelist=ko,
+  nlandmarks=12,
+  scale = NULL,
+  tpsfile="top15.tps",
+  MultScale = FALSE,
+  verbose = TRUE
+)
+```
+
+How to make the remaining ones sliding landmarks?
+
+``` r
+top12 <- readland.tps(file="top15.tps")
+```
+
+
+    No specID provided; specimens will be numbered 1, 2, 3 ...
+
+    No curves detected; all points appear to be fixed landmarks.
+
+    Warning in readland.tps(file = "top15.tps"): Not all specimens have scale adjustment (perhaps because they are already scaled); 
+    no rescaling will be performed in these cases
+
+``` r
+plot(x = top12[,1,1],
+     y = top12[,2,1], 
+     pch = 16)
+```
+
+![](GM_files/figure-commonmark/unnamed-chunk-3-1.png)
+
+``` r
+define.sliders(landmarks = top12, 
+               nsliders = 7, 
+               write.file = TRUE)
+```
+
+After some clicking in interactive mode, which cannot be shown in Quarto
+and needs to be done directly in R, a file called `curveslide.csv` is
+saved and can be used in future analyses. Now we can digitize two more
+specimens. Important is to always use the same number of landmarks and
+place them in the same order.
+
+``` r
+top.gpa<-gpagen(top12)
+```
+
+
+    Performing GPA
+
+      |                                                                            
+      |                                                                      |   0%
+      |                                                                            
+      |==================                                                    |  25%
+      |                                                                            
+      |===================================                                   |  50%
+      |                                                                            
+      |======================================================================| 100%
+
+    Making projections... Finished!
+
+``` r
+top.gpa$links <- define.links(top.gpa$coords[,,1])
+```
+
+``` r
+plotAllSpecimens(top.gpa$coords,
+                 links = top.gpa$links)
+```
+
+![](GM_files/figure-commonmark/unnamed-chunk-6-1.png)
+
+``` r
+top.PCA <- gm.prcomp(top.gpa$coords)
+plot(top.PCA, 
+     main = "PCA top view")
+text(top.PCA$x[,1], 
+     top.PCA$x[,2], 
+     labels = c("Trip1_ko213", "Trip1_ko214", "Trip2_ko214"),
+     offset = 0.6,
+     pos = 3)
+```
+
+![](GM_files/figure-commonmark/unnamed-chunk-7-1.png)
