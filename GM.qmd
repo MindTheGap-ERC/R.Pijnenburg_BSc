@@ -7,7 +7,6 @@ format: gfm
 ```{r setup}
 #| include: FALSE
 require(geomorph)
-require(Momocs)
 ```
 
 ## The goal
@@ -44,40 +43,7 @@ plot(x = top[,1,1],
      pch = 16)
 ```
 
-That really isn't a lot to go by. Let us try to extract the outline into a xy matrix.
-
-## Momocs
-
-This package can turn an image into coordinates but it has to be a black outline on a white background. I did it in Photoshop, in a relatively time-consuming way. This might need to be optimized.
-
-![The same image but turned into black silhouette](Trip1_ko213_bw.jpg)
-
-```{r extract conodont outline}
-Ko213_1 <- Momocs::import_jpg("Trip1_ko213_bw.jpg",
-                  auto.notcentered = TRUE)
-
-plot(Ko213_1$Trip1_ko213_bw,
-     col = rainbow(nrow(Ko213_1$Trip1_ko213_bw)))
-
-points(x = top[,1,],
-       y = top[,2,],
-       col = "black",
-       pch = 16)
-```
-
-This gave us 2804 landmarks (need to find how to evaluate in-line expressions in Quarto). That might be too many. We need a comparable number between specimens. We could subsample these landmarks to a reasonable number using the `runif` function that samples from a uniform distribution.
-
-```{r subsample from the outline}
-Ko213_1_100 <- Ko213_1$Trip1_ko213_bw[runif(300,
-                                   min = 1,
-                                   max = nrow(Ko213_1$Trip1_ko213_bw)),]
-
-plot(Ko213_1_100)
-```
-
-But these landmarks are not very well spaced. Maybe we need to get back to `geomorph` and use the function `define.sliders`. The problem with `geomorph` is that it's not well documented. [`Momocs` is pretty good.](https://momx.github.io/Momocs/articles/Momocs_intro.html)
-
-But maybe we prefer to use Fourier transform instead? To be discussed with Robin, Twan, Przemek and Niklas.
+That really isn't a lot to go by. 
 
 ## Sliding landmarks in geomorph
 
@@ -114,6 +80,8 @@ define.sliders(landmarks = top12,
 ```
 
 After some clicking in interactive mode, which cannot be shown in Quarto and needs to be done directly in R, a file called `curveslide.csv` is saved and can be used in future analyses. Now we can digitize two more specimens. Important is to always use the same number of landmarks and place them in the same order.
+
+# Actual analysis: Procrustes
 
 ```{r}
 top.gpa<-gpagen(top12)
