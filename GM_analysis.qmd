@@ -1,0 +1,61 @@
+---
+title: "Robin's GM analysis"
+format: docx
+---
+
+## Importing landmarks into R
+
+```{r setup}
+#| include: FALSE
+#| echo: FALSE
+require(geomorph)
+```
+
+```{r}
+#| warning: FALSE
+landmarks <- readland.tps(file="robin_conodonts.TPS",
+                          readcurves = TRUE,
+                          specID = "imageID")
+```
+
+## Procrustes analysis
+
+```{r}
+landmarks.gpa<-gpagen(landmarks)
+plot(landmarks.gpa)
+```
+
+### Adding links between landmarks (optional)
+
+Robin: if you want to connect the landmarks to create a shape, you will have to click pairs of landmarks (only once per analysis). This is triggered by the following command. Only run it if you are ready to click through all the pairs of landmarks ;-)
+
+```{r}
+landmarks.gpa$links <- define.links(landmarks.gpa$coords[,,1])
+```
+
+If you define the links, save your dataset directly into an R object, otherwise you have to re-run it:
+
+```{r}
+saveRDS(landmarks.gpa, file="landmarks.gpa.RData")
+landmarks.gpa <- readRDS(file="landmarks.gpa.RData")
+```
+
+## Plotting the landmarks prior to the Procrustes analysis
+
+See the dispersion between the specimens:
+
+```{r}
+#| fig-cap: "Dispersion of landmarks across specimens"
+plotAllSpecimens(landmarks.gpa$coords,
+                 links = landmarks.gpa$links)
+```
+
+the `links = landmarks.gpa$links` line only works if you have defined the links
+
+## Principal component analysis and plotting its results
+
+```{r}
+PCA <- gm.prcomp(landmarks.gpa$coords) 
+plot(PCA, main = "PCA of Tripodellus shapes")
+```
+Together PC1 and PC2 explain over 60% of the variability in shapes, that's pretty good!
