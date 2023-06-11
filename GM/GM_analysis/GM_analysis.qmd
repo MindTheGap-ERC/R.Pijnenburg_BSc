@@ -58,4 +58,54 @@ the `links = landmarks.gpa$links` line only works if you have defined the links
 PCA <- gm.prcomp(landmarks.gpa$coords) 
 plot(PCA, main = "PCA of Tripodellus shapes")
 ```
+
 Together PC1 and PC2 explain over 60% of the variability in shapes, that's pretty good!
+
+## Exploring shape variation across PC space
+
+### Mean shape of Tripodellus gracilis
+
+```{r}
+meanshape <- mshape(landmarks.gpa$coords)
+plot(meanshape)
+```
+
+### Exploring PC1
+
+#### Deformation Grid: PC1 Minimum against Mean Shape
+
+```{r}
+plotRefToTarget(PCA$shapes$shapes.comp1$min, meanshape)
+```
+
+#### Deformation Grid: PC1 Maximum against Mean Shape
+
+```{r}
+plotRefToTarget(PCA$shapes$shapes.comp1$max, meanshape)
+```
+
+#### PC1 Minimum against Maximum
+
+```{r}
+plotRefToTarget(PCA$shapes$shapes.comp1$min, PCA$shapes$shapes.comp1$max, method = "vector", mag=2)
+```
+
+### Exploring PC2
+
+#### Deformation Grid: PC2 Minimum against Mean Shape
+
+```{r}
+plotRefToTarget(PCA$shapes$shapes.comp2$min, meanshape)
+```
+
+#### Deformation Grid: PC2 Maximum against Mean Shape
+
+```{r}
+plotRefToTarget(PCA$shapes$shapes.comp2$max, meanshape)
+```
+
+#### PC2 Minimum against Maximum
+
+```{r}
+plotRefToTarget(PCA$shapes$shapes.comp2$min, PCA$shapes$shapes.comp2$max, method = "vector", mag = 2)
+```
