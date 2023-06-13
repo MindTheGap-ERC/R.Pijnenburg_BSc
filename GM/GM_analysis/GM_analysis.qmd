@@ -1,6 +1,8 @@
 ---
 title: "Robin's GM analysis"
-format: docx
+format: html
+execute:
+  echo: false
 ---
 
 ## Importing landmarks into R
@@ -9,6 +11,7 @@ format: docx
 #| include: FALSE
 #| echo: FALSE
 require(geomorph)
+require(scales)
 ```
 
 ```{r}
@@ -30,13 +33,14 @@ plot(landmarks.gpa)
 Robin: if you want to connect the landmarks to create a shape, you will have to click pairs of landmarks (only once per analysis). This is triggered by the following command. Only run it if you are ready to click through all the pairs of landmarks ;-)
 
 ```{r}
+#| eval: FALSE
 landmarks.gpa$links <- define.links(landmarks.gpa$coords[,,1])
 ```
 
 If you define the links, save your dataset directly into an R object, otherwise you have to re-run it:
 
 ```{r}
-saveRDS(landmarks.gpa, file="landmarks.gpa.RData")
+#saveRDS(landmarks.gpa, file="landmarks.gpa.RData")
 landmarks.gpa <- readRDS(file="landmarks.gpa.RData")
 ```
 
@@ -61,6 +65,70 @@ plot(PCA, main = "PCA of Tripodellus shapes")
 
 Together PC1 and PC2 explain over 60% of the variability in shapes, that's pretty good!
 
+Let's customize the plot to plot the labels.
+
+```{r}
+plot(PCA$x[,1], PCA$x[,2],
+     pch = 16,
+     xlab = "PC 1",
+     ylab = "PC 2",
+     main = "PCA of the platform outline of T. gracilis"
+)
+text(x = PCA$x[,1],
+     y = PCA$x[,2],
+     labels = dimnames(landmarks.gpa$coords)[[3]],
+     pos = 1,
+     cex = 0.7
+     )
+```
+
+
+Calculate the size of each specimen (along the X axis, i.e. length)
+
+```{r}
+size <- numeric(length = dim(landmarks.gpa$coords)[3])
+for (i in 1:dim(landmarks.gpa$coords)[3]) {
+  size[i] <- max(landmarks.gpa$coords[,1,i]) - min(landmarks.gpa$coords[,1,i])
+}
+```
+
+
+```{r}
+my.colors<-colorRampPalette(c("red","blue"))
+color.name=my.colors(dim(landmarks.gpa$coords)[3])
+size.scaled <- rescale(size, to = c(1,dim(landmarks.gpa$coords)[3]))
+
+plot(PCA$x[,1], PCA$x[,2],
+     pch = 16,
+     bg = color.name[size.scaled],
+     cex = rescale(size, to = c(0.6, 2)),
+     col = color.name[size.scaled],
+     xlab = "PC 1",
+     ylab = "PC 2",
+     main = "PCA of the platform outline of T. gracilis"
+)
+```
+The size and colour of the points is proportional to the size of the element. There is clearly a correlation between size and PC1.
+
+### Regression analysis
+
+We start with a simple linear regression.
+
+```{r}
+model_pc1 <- lm(PCA$x[,1] ~ size)
+plot(size, PCA$x[,1], type = "p",
+       xlab = "Size [mm]",
+       ylab = "PC 1")
+abline(a = model_pc1$coefficients[1], 
+       b = model_pc1$coefficients[2],
+       col="blue")
+```
+
+```{r}
+summary(model_pc1)
+```
+Even though there is a big scatter around the trend, PC1 decreases significantly with the length of the element. That suggests that specimens on the right side correspond to younger individuals.
+
 ## Exploring shape variation across PC space
 
 ### Mean shape of Tripodellus gracilis
@@ -81,7 +149,7 @@ plotRefToTarget(PCA$shapes$shapes.comp1$min, meanshape)
 #### Deformation Grid: PC1 Maximum against Mean Shape
 
 ```{r}
-plotRefToTarget(PCA$shapes$shapes.comp1$max, meanshape)
+plotRefToTarget(PCA$shapes$shapes.comp1$max, meanshape, method = "vector")
 ```
 
 #### PC1 Minimum against Maximum
@@ -95,13 +163,13 @@ plotRefToTarget(PCA$shapes$shapes.comp1$min, PCA$shapes$shapes.comp1$max, method
 #### Deformation Grid: PC2 Minimum against Mean Shape
 
 ```{r}
-plotRefToTarget(PCA$shapes$shapes.comp2$min, meanshape)
+plotRefToTarget(PCA$shapes$shapes.comp2$min, method = "vector", meanshape)
 ```
 
 #### Deformation Grid: PC2 Maximum against Mean Shape
 
 ```{r}
-plotRefToTarget(PCA$shapes$shapes.comp2$max, meanshape)
+plotRefToTarget(PCA$shapes$shapes.comp2$max, meanshape, method = "vector")
 ```
 
 #### PC2 Minimum against Maximum
