@@ -14,12 +14,18 @@ require(geomorph)
 require(scales)
 ```
 
+### My samples
+
 ```{r}
 #| warning: FALSE
 landmarks <- readland.tps(file="robin_conodonts.TPS",
                           readcurves = TRUE,
                           specID = "imageID")
 ```
+
+### Tripodellus gracilis example
+
+### Tripodellus schleizius examples
 
 ## Procrustes analysis
 
@@ -177,3 +183,9 @@ plotRefToTarget(PCA$shapes$shapes.comp2$max, meanshape, method = "vector")
 ```{r}
 plotRefToTarget(PCA$shapes$shapes.comp2$min, PCA$shapes$shapes.comp2$max, method = "vector", mag = 2)
 ```
+
+## Comparing samples to Dzik species
+
+### Dzik Tripodellus gracilis
+
+### Dzik Tripodellus schleizius
