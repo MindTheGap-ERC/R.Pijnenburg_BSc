@@ -140,13 +140,13 @@ plot(meanshape)
 
 ### Exploring PC1
 
-#### Deformation Grid: PC1 Minimum against Mean Shape
+#### PC1 Minimum against Mean Shape
 
 ```{r}
 plotRefToTarget(PCA$shapes$shapes.comp1$min, meanshape)
 ```
 
-#### Deformation Grid: PC1 Maximum against Mean Shape
+#### PC1 Maximum against Mean Shape
 
 ```{r}
 plotRefToTarget(PCA$shapes$shapes.comp1$max, meanshape, method = "vector")
@@ -160,13 +160,13 @@ plotRefToTarget(PCA$shapes$shapes.comp1$min, PCA$shapes$shapes.comp1$max, method
 
 ### Exploring PC2
 
-#### Deformation Grid: PC2 Minimum against Mean Shape
+#### PC2 Minimum against Mean Shape
 
 ```{r}
 plotRefToTarget(PCA$shapes$shapes.comp2$min, method = "vector", meanshape)
 ```
 
-#### Deformation Grid: PC2 Maximum against Mean Shape
+#### PC2 Maximum against Mean Shape
 
 ```{r}
 plotRefToTarget(PCA$shapes$shapes.comp2$max, meanshape, method = "vector")
