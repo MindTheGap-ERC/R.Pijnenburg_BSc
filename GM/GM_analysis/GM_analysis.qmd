@@ -14,12 +14,18 @@ require(geomorph)
 require(scales)
 ```
 
+### My samples
+
 ```{r}
 #| warning: FALSE
 landmarks <- readland.tps(file="robin_conodonts.TPS",
                           readcurves = TRUE,
                           specID = "imageID")
 ```
+
+### Tripodellus gracilis example
+
+### Tripodellus schleizius examples
 
 ## Procrustes analysis
 
@@ -194,13 +200,13 @@ plot(meanshape)
 
 ### Exploring PC1
 
-#### Deformation Grid: PC1 Minimum against Mean Shape
+#### PC1 Minimum against Mean Shape
 
 ```{r}
 plotRefToTarget(PCA$shapes$shapes.comp1$min, meanshape)
 ```
 
-#### Deformation Grid: PC1 Maximum against Mean Shape
+#### PC1 Maximum against Mean Shape
 
 ```{r}
 plotRefToTarget(PCA$shapes$shapes.comp1$max, meanshape, method = "vector")
@@ -214,13 +220,13 @@ plotRefToTarget(PCA$shapes$shapes.comp1$min, PCA$shapes$shapes.comp1$max, method
 
 ### Exploring PC2
 
-#### Deformation Grid: PC2 Minimum against Mean Shape
+#### PC2 Minimum against Mean Shape
 
 ```{r}
 plotRefToTarget(PCA$shapes$shapes.comp2$min, method = "vector", meanshape)
 ```
 
-#### Deformation Grid: PC2 Maximum against Mean Shape
+#### PC2 Maximum against Mean Shape
 
 ```{r}
 plotRefToTarget(PCA$shapes$shapes.comp2$max, meanshape, method = "vector")
@@ -231,3 +237,9 @@ plotRefToTarget(PCA$shapes$shapes.comp2$max, meanshape, method = "vector")
 ```{r}
 plotRefToTarget(PCA$shapes$shapes.comp2$min, PCA$shapes$shapes.comp2$max, method = "vector", mag = 2)
 ```
+
+## Comparing samples to Dzik species
+
+### Dzik Tripodellus gracilis
+
+### Dzik Tripodellus schleizius
