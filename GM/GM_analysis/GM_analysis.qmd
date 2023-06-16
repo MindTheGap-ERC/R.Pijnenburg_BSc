@@ -82,6 +82,60 @@ text(x = PCA$x[,1],
      )
 ```
 
+# Position in section
+
+```{r}
+heights <- read.csv(file = "BedHeights.csv",
+                    sep = ",",
+                    header = T)
+```
+
+```{r}
+sample_heights <- gsub("\\D*","",dimnames(landmarks.gpa$coords)[[3]])
+sample_heights <- as.numeric(sample_heights)
+height.colors<-colorRampPalette(c("orange","purple"))
+height.color.name <- height.colors(dim(landmarks.gpa$coords)[3])
+height.scaled <- rescale(sample_heights, to = c(1,dim(landmarks.gpa$coords)[3])) 
+```
+
+```{r}
+plot(PCA$x[,1], PCA$x[,2],
+     pch = 16,
+     bg = height.color.name[height.scaled],
+     cex = rescale(sample_heights, to = c(0.6, 2)),
+     col = height.color.name[height.scaled],
+     xlab = "PC 1",
+     ylab = "PC 2",
+     main = "PCA of the platform outline of T. gracilis",
+     ylim = c(-0.07,0.07)
+)
+text(x = PCA$x[,1],
+     y = PCA$x[,2],
+     labels = sample_heights,
+     pos = 1,
+     cex = 0.7
+     )
+```
+There doesn't seem to be any link between PC1 or PC2 and the position in section.
+
+```{r}
+model_height_pc1 <- lm(PCA$x[,1] ~ sample_heights)
+plot(sample_heights, PCA$x[,1], type = "p",
+       xlab = "Size [mm]",
+       ylab = "PC 1")
+abline(a = model_height_pc1$coefficients[1], 
+       b = model_height_pc1$coefficients[2],
+       col="blue")
+```
+
+The heights might need some transformation (such as standardization).
+
+```{r}
+summary(model_height_pc1)
+```
+The relationship between PC1 and height in section is not significant. But, again, might need some transformation.
+
+### Size of elements
 
 Calculate the size of each specimen (along the X axis, i.e. length)
 
@@ -91,7 +145,7 @@ for (i in 1:dim(landmarks.gpa$coords)[3]) {
   size[i] <- max(landmarks.gpa$coords[,1,i]) - min(landmarks.gpa$coords[,1,i])
 }
 ```
-
+ 
 
 ```{r}
 my.colors<-colorRampPalette(c("red","blue"))
