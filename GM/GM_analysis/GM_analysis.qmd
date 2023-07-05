@@ -66,7 +66,7 @@ the `links = landmarks.gpa$links` line only works if you have defined the links
 
 ```{r}
 PCA <- gm.prcomp(landmarks.gpa$coords) 
-plot(PCA, main = "PCA of Tripodellus shapes")
+plot(PCA, main = expression("PC1 and PC2 of "*italic(T.~gracilis)*" shapes"))
 ```
 
 Together PC1 and PC2 explain over 60% of the variability in shapes, that's pretty good!
@@ -78,7 +78,7 @@ plot(PCA$x[,1], PCA$x[,2],
      pch = 16,
      xlab = "PC 1",
      ylab = "PC 2",
-     main = "PCA of the platform outline of T. gracilis"
+     main = expression("PC1 and PC2 of "*italic(T.~gracilis)*" shapes")
 )
 text(x = PCA$x[,1],
      y = PCA$x[,2],
@@ -86,6 +86,47 @@ text(x = PCA$x[,1],
      pos = 1,
      cex = 0.7
      )
+```
+
+# Relative age
+
+```{r}
+age <- read.csv(file = "RelativeAges.csv",
+                 sep = ",",
+                 header = T)
+```
+
+```{r}
+#| label: Extract bed name from file names
+sample_names <- gsub("\\D*","",dimnames(landmarks.gpa$coords)[[3]])
+sample_names <- as.numeric(sample_names)
+```
+
+```{r}
+#| label: match sample names with heights in section
+sample_names <- data.frame(sample_names)
+Positions <- merge(x = sample_names,
+      y = age,
+      by.x = "sample_names",
+      by.y = "Bed",
+      all.x = T)
+```
+
+```{r}
+age.colors <- colorRampPalette(c("orange","purple"))
+age.color.name <- age.colors(Positions$Age)
+
+plot(PCA$x[,1], PCA$x[,2],
+     pch = 16,
+     bg = age.color.name[Positions$Age],
+     cex = scales::rescale(Positions$Age, to = c(0.6, 2)),
+     col = age.color.name[Positions$Age],
+     xlab = "PC 1",
+     ylab = "PC 2",
+     main = expression("PC1 and PC2 of "*italic(T.~gracilis)*" shapes"),
+     xlim = c(-0.15,0.15),
+     ylim = c(-0.06,0.07)
+)
 ```
 
 # Position in section
@@ -107,7 +148,7 @@ sample_names <- as.numeric(sample_names)
 ```{r}
 #| label: match sample names with heights in section
 sample_names <- data.frame(sample_names)
-Positions <- merge(x = sample_names,
+Positions2 <- merge(x = sample_names,
       y = heights,
       by.x = "sample_names",
       by.y = "Bed",
@@ -117,13 +158,13 @@ Positions <- merge(x = sample_names,
 
 ```{r}
 height.colors<-colorRampPalette(c("orange","purple"))
-height.color.name <- height.colors(Positions$Height)
+height.color.name <- height.colors(Positions2$Height)
 
 plot(PCA$x[,1], PCA$x[,2],
      pch = 16,
-     bg = height.color.name[Positions$Height],
-     cex = scales::rescale(Positions$Height, to = c(0.6, 2)),
-     col = height.color.name[Positions$Height],
+     bg = height.color.name[Positions2$Height],
+     cex = scales::rescale(Positions2$Height, to = c(0.6, 2)),
+     col = height.color.name[Positions2$Height],
      xlab = "PC 1",
      ylab = "PC 2",
      main = "PCA of the platform outline of T. gracilis",
@@ -131,7 +172,7 @@ plot(PCA$x[,1], PCA$x[,2],
 )
 text(x = PCA$x[,1],
      y = PCA$x[,2],
-     labels = round(Positions$Height,1),
+     labels = round(Positions2$Height,1),
      pos = 1,
      cex = 0.7
      )
