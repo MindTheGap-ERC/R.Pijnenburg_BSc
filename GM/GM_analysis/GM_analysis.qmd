@@ -69,6 +69,11 @@ PCA <- gm.prcomp(landmarks.gpa$coords)
 plot(PCA, main = expression("PC1 and PC2 of "*italic(T.~gracilis)*" shapes"))
 ```
 
+```{r}
+PCA <- gm.prcomp(landmarks.gpa$coords) 
+plot(PCA, axis1 = 3, axis2 = 4, main = expression("PC1 and PC2 of "*italic(T.~gracilis)*" shapes"))
+```
+
 Together PC1 and PC2 explain over 60% of the variability in shapes, that's pretty good!
 
 Let's customize the plot to plot the labels.
@@ -121,11 +126,25 @@ plot(PCA$x[,1], PCA$x[,2],
      bg = age.color.name[Positions$Age],
      cex = scales::rescale(Positions$Age, to = c(0.6, 2)),
      col = age.color.name[Positions$Age],
-     xlab = "PC 1",
-     ylab = "PC 2",
+     xlab = "PC 1: 40.46%",
+     ylab = "PC 2: 19.87%",
      main = expression("PC1 and PC2 of "*italic(T.~gracilis)*" shapes"),
-     xlim = c(-0.15,0.15),
-     ylim = c(-0.06,0.07)
+     xlim = c(-0.10,0.10),
+     ylim = c(-0.06,0.06)
+)
+```
+
+```{r}
+plot(PCA$x[,3], PCA$x[,4],
+     pch = 16,
+     bg = age.color.name[Positions$Age],
+     cex = scales::rescale(Positions$Age, to = c(0.6, 2)),
+     col = age.color.name[Positions$Age],
+     xlab = "PC 3: 14.65%",
+     ylab = "PC 4: 6.55%",
+     main = expression("PC3 and PC4 of "*italic(T.~gracilis)*" shapes"),
+     xlim = c(-0.06,0.06),
+     ylim = c(-0.04,0.04)
 )
 ```
 
@@ -274,7 +293,7 @@ plotRefToTarget(PCA$shapes$shapes.comp1$max, meanshape, method = "vector")
 #### PC1 Minimum against Maximum
 
 ```{r}
-plotRefToTarget(PCA$shapes$shapes.comp1$min, PCA$shapes$shapes.comp1$max, method = "vector", mag=2)
+plotRefToTarget(PCA$shapes$shapes.comp1$min, PCA$shapes$shapes.comp1$max, method = "vector", mag=1)
 ```
 
 ### Exploring PC2
@@ -294,11 +313,13 @@ plotRefToTarget(PCA$shapes$shapes.comp2$max, meanshape, method = "vector")
 #### PC2 Minimum against Maximum
 
 ```{r}
-plotRefToTarget(PCA$shapes$shapes.comp2$min, PCA$shapes$shapes.comp2$max, method = "vector", mag = 2)
+plotRefToTarget(PCA$shapes$shapes.comp2$min, PCA$shapes$shapes.comp2$max, method = "vector", mag = 1)
 ```
 
-## Comparing samples to Dzik species
+### Exploring PC3
 
-### Dzik Tripodellus gracilis
+#### PC3 Minimum against Maximum
 
-### Dzik Tripodellus schleizius
+```{r}
+plotRefToTarget(PCA$shapes$shapes.comp3$min, PCA$shapes$shapes.comp3$max, method = "vector", mag = 1)
+```
