@@ -23,10 +23,6 @@ landmarks <- readland.tps(file="robin_conodonts.TPS",
                           specID = "imageID")
 ```
 
-### Tripodellus gracilis example
-
-### Tripodellus schleizius examples
-
 ## Procrustes analysis
 
 ```{r}
@@ -93,7 +89,7 @@ text(x = PCA$x[,1],
      )
 ```
 
-# Relative age
+# Giving samples relative ages
 
 ```{r}
 age <- read.csv(file = "RelativeAges.csv",
@@ -105,17 +101,44 @@ age <- read.csv(file = "RelativeAges.csv",
 #| label: Extract bed name from file names
 sample_names <- gsub("\\D*","",dimnames(landmarks.gpa$coords)[[3]])
 sample_names <- as.numeric(sample_names)
+sample_names <- data.frame(sample_names)
 ```
 
 ```{r}
-#| label: match sample names with heights in section
-sample_names <- data.frame(sample_names)
-Positions <- merge(x = sample_names,
+#| label: match sample names with ages in section
+positions <- merge(x = sample_names,
       y = age,
       by.x = "sample_names",
       by.y = "Bed",
       all.x = T)
 ```
+
+## PCA over time
+
+```{r}
+#| label: PC1
+plot(positions$Age, PCA$x[,1],
+     main = "Change in PC1 over time",
+     xlab = "Relative Age (kyr)",
+     ylab = "PC1")
+```
+```{r}
+#| label: PC2
+plot(positions$Age, PCA$x[,2],
+     main = "Change in PC2 over time",
+     xlab = "Relative Age (kyr)",
+     ylab = "PC2")
+```
+```{r}
+#| label: PC3
+plot(positions$Age, PCA$x[,3],
+     main = "Change in PC3 over time",
+     xlab = "Relative Age (kyr)",
+     ylab = "PC3")
+```
+
+
+## PCA plots with relative ages
 
 ```{r}
 age.colors <- colorRampPalette(c("orange","purple"))
@@ -199,12 +222,12 @@ text(x = PCA$x[,1],
 There doesn't seem to be any link between PC1 or PC2 and the position in section.
 
 ```{r}
-model_height_pc1 <- procD.lm(PCA$x[,1] ~ Positions$Height)
+model_height_pc1 <- procD.lm(PCA$x[,1] ~ Positions2$Height)
 ```
 
 
 ```{r}
-plot(Positions$Height, PCA$x[,1], type = "p",
+plot(Positions2$Height, PCA$x[,1], type = "p",
        xlab = "Position in section [m]",
        ylab = "PC 1")
 abline(a = model_height_pc1$coefficients[1], 
