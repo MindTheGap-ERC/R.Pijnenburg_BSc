@@ -117,21 +117,21 @@ positions <- merge(x = sample_names,
 
 ```{r}
 #| label: PC1
-plot(positions$Age, PCA$x[,1],
+plot(positions$Age/1000, PCA$x[,1],
      main = "Change in PC1 over time",
      xlab = "Relative Age (kyr)",
      ylab = "PC1")
 ```
 ```{r}
 #| label: PC2
-plot(positions$Age, PCA$x[,2],
+plot(positions$Age/1000, PCA$x[,2],
      main = "Change in PC2 over time",
      xlab = "Relative Age (kyr)",
      ylab = "PC2")
 ```
 ```{r}
 #| label: PC3
-plot(positions$Age, PCA$x[,3],
+plot(positions$Age/1000, PCA$x[,3],
      main = "Change in PC3 over time",
      xlab = "Relative Age (kyr)",
      ylab = "PC3")
