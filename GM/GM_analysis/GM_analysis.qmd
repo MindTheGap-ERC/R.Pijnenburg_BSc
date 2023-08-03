@@ -68,7 +68,13 @@ plot(PCA, main = expression("PC1 and PC2 of "*italic(T.~gracilis)*" shapes"))
 
 ```{r}
 PCA <- gm.prcomp(landmarks.gpa$coords) 
-plot(PCA, axis1 = 3, axis2 = 4, main = expression("PC1 and PC2 of "*italic(T.~gracilis)*" shapes"))
+plot(PCA,
+     axis1 = 3,
+     axis2 = 4,
+     main = expression("PC3 and PC4 of "*italic(T.~gracilis)*" shapes"),
+     xlim = c(-0.10,0.10),
+     ylim = c(-0.05, 0.05)
+     )
 ```
 
 Together PC1 and PC2 explain over 60% of the variability in shapes, that's pretty good!
@@ -163,8 +169,11 @@ plot(bonus_PCA$x[,1], bonus_PCA$x[,2],
      pch = 16,
      xlab = "PC 1",
      ylab = "PC 2",
-     main = expression("PC1 and PC2 of "*italic(T.~gracilis)*" shapes")
-)
+     main = expression("PC1 and PC2 of "*italic(T.~gracilis)*" shapes"),
+     xlim = c(-0.15,0.15),
+     ylim = c(-0.06,0.06)
+     )
+
 text(x = bonus_PCA$x[,1][selected],
      y = bonus_PCA$x[,2][selected],
      labels = dimnames(bonus_landmarks.gpa$coords)[[3]],
@@ -179,7 +188,9 @@ plot(bonus_PCA$x[,3], bonus_PCA$x[,4],
      pch = 16,
      xlab = "PC 3",
      ylab = "PC 4",
-     main = expression("PC3 and PC4 of "*italic(T.~gracilis)*" shapes")
+     main = expression("PC3 and PC4 of "*italic(T.~gracilis)*" shapes"),
+     xlim = c(-0.10,0.10),
+     ylim = c(-0.05, 0.05)
 )
 text(x = bonus_PCA$x[,3][selected],
      y = bonus_PCA$x[,4][selected],
