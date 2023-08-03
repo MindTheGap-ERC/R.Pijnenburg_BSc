@@ -14,6 +14,7 @@ require(geomorph)
 require(scales)
 ```
 
+
 ### My samples
 
 ```{r}
@@ -136,6 +137,58 @@ plot(positions$Age/1000, PCA$x[,3],
      xlab = "Relative Age (kyr)",
      ylab = "PC3")
 ```
+
+
+## PCA with Schleizius and Gracilis holotypes
+
+```{r}
+bonus_TPS <- c("robin_conodonts.TPS", "schleiziusDzik_all.TPS", "gracilisDzik.TPS")
+bonus_landmarks <- readmulti.tps(filelist = bonus_TPS,
+                                 readcurves = TRUE,
+                                 specID = "imageID")
+```
+
+```{r}
+bonus_landmarks.gpa <- gpagen(bonus_landmarks)
+plot(bonus_landmarks.gpa)
+```
+
+```{r}
+bonus_PCA <- gm.prcomp(bonus_landmarks.gpa$coords) 
+selected <- c(61, 62, 63, 64, 65)
+```
+
+```{r}
+plot(bonus_PCA$x[,1], bonus_PCA$x[,2],
+     pch = 16,
+     xlab = "PC 1",
+     ylab = "PC 2",
+     main = expression("PC1 and PC2 of "*italic(T.~gracilis)*" shapes")
+)
+text(x = bonus_PCA$x[,1][selected],
+     y = bonus_PCA$x[,2][selected],
+     labels = dimnames(bonus_landmarks.gpa$coords)[[3]],
+     pos = 1,
+     cex = 0.7
+     )
+```
+
+
+```{r}
+plot(bonus_PCA$x[,3], bonus_PCA$x[,4],
+     pch = 16,
+     xlab = "PC 3",
+     ylab = "PC 4",
+     main = expression("PC3 and PC4 of "*italic(T.~gracilis)*" shapes")
+)
+text(x = bonus_PCA$x[,3][selected],
+     y = bonus_PCA$x[,4][selected],
+     labels = dimnames(bonus_landmarks.gpa$coords)[[3]],
+     pos = 1,
+     cex = 0.7
+     )
+```
+
 
 
 ## PCA plots with relative ages
