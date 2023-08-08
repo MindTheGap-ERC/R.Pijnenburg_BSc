@@ -5,8 +5,6 @@ execute:
   echo: false
 ---
 
-## Importing landmarks into R
-
 ```{r setup}
 #| include: FALSE
 #| echo: FALSE
@@ -14,8 +12,7 @@ require(geomorph)
 require(scales)
 ```
 
-
-### My samples
+# 1. Importing landmarks into R
 
 ```{r}
 #| warning: FALSE
@@ -24,14 +21,14 @@ landmarks <- readland.tps(file="robin_conodonts.TPS",
                           specID = "imageID")
 ```
 
-## Procrustes analysis
+# 2. Procrustes analysis
 
 ```{r}
 landmarks.gpa<-gpagen(landmarks)
 plot(landmarks.gpa)
 ```
 
-### Adding links between landmarks (optional)
+## Adding links between landmarks (optional)
 
 Robin: if you want to connect the landmarks to create a shape, you will have to click pairs of landmarks (only once per analysis). This is triggered by the following command. Only run it if you are ready to click through all the pairs of landmarks ;-)
 
@@ -59,7 +56,9 @@ plotAllSpecimens(landmarks.gpa$coords,
 
 the `links = landmarks.gpa$links` line only works if you have defined the links
 
-## Principal component analysis and plotting its results
+# 3. Principal Component Analysis
+
+## PC1 and PC2
 
 ```{r}
 PCA <- gm.prcomp(landmarks.gpa$coords) 
@@ -67,21 +66,7 @@ plot(PCA, main = expression("PC1 and PC2 of "*italic(T.~gracilis)*" shapes"))
 ```
 
 ```{r}
-PCA <- gm.prcomp(landmarks.gpa$coords) 
-plot(PCA,
-     axis1 = 3,
-     axis2 = 4,
-     main = expression("PC3 and PC4 of "*italic(T.~gracilis)*" shapes"),
-     xlim = c(-0.10,0.10),
-     ylim = c(-0.05, 0.05)
-     )
-```
-
-Together PC1 and PC2 explain over 60% of the variability in shapes, that's pretty good!
-
-Let's customize the plot to plot the labels.
-
-```{r}
+#| label: PC1 and PC2 with labels
 plot(PCA$x[,1], PCA$x[,2],
      pch = 16,
      xlab = "PC 1",
@@ -96,9 +81,23 @@ text(x = PCA$x[,1],
      )
 ```
 
-# Giving samples relative ages
+## PC3 and PC4
 
 ```{r}
+PCA <- gm.prcomp(landmarks.gpa$coords) 
+plot(PCA,
+     axis1 = 3,
+     axis2 = 4,
+     main = expression("PC3 and PC4 of "*italic(T.~gracilis)*" shapes"),
+     xlim = c(-0.10,0.10),
+     ylim = c(-0.05, 0.05)
+     )
+```
+
+# 4. Assigning relative ages to the samples
+
+```{r}
+#| label: Import relative age data
 age <- read.csv(file = "RelativeAges.csv",
                  sep = ",",
                  header = T)
@@ -112,7 +111,7 @@ sample_names <- data.frame(sample_names)
 ```
 
 ```{r}
-#| label: match sample names with ages in section
+#| label: Match sample names with ages in section
 positions <- merge(x = sample_names,
       y = age,
       by.x = "sample_names",
@@ -120,34 +119,116 @@ positions <- merge(x = sample_names,
       all.x = T)
 ```
 
-## PCA over time
+# 5. Change in PCs over time
+
+## Change in PC1 over time
+
+```{r}
+model_age_pc1 <- procD.lm(PCA$x[,1] ~ positions$Age)
+```
 
 ```{r}
 #| label: PC1
 plot(positions$Age/1000, PCA$x[,1],
      main = "Change in PC1 over time",
+     yaxt="n",
      xlab = "Relative Age (kyr)",
      ylab = "PC1")
+abline(a = model_age_pc1$coefficients[1], 
+       b = model_age_pc1$coefficients[2],
+       col="blue")
 ```
+
+## Change in PC2 over time
+
 ```{r}
 #| label: PC2
 plot(positions$Age/1000, PCA$x[,2],
      main = "Change in PC2 over time",
+     yaxt="n",
      xlab = "Relative Age (kyr)",
      ylab = "PC2")
 ```
+
+## Change in PC3 over time
+
 ```{r}
 #| label: PC3
 plot(positions$Age/1000, PCA$x[,3],
      main = "Change in PC3 over time",
+     yaxt="n",
      xlab = "Relative Age (kyr)",
      ylab = "PC3")
 ```
 
+# 6. Exploring shape variation across PC space
 
-## PCA with Schleizius and Gracilis holotypes
+## Mean shape of *Tripodellus gracilis*
 
 ```{r}
+meanshape <- mshape(landmarks.gpa$coords)
+plot(meanshape)
+```
+
+## Exploring PC1
+
+```{r}
+#| label: PC1 Min vs Mean Shape
+plotRefToTarget(PCA$shapes$shapes.comp1$min, meanshape,
+                method = "vector",
+                mag = 1)
+```
+
+```{r}
+#| label: PC1 Max vs Mean Shape
+plotRefToTarget(PCA$shapes$shapes.comp1$max, meanshape,
+                method = "vector",
+                mag = 1)
+```
+
+```{r}
+#| label: PC1 Min vs Max
+plotRefToTarget(PCA$shapes$shapes.comp1$min, PCA$shapes$shapes.comp1$max,
+                method = "vector",
+                mag = 1)
+```
+
+## Exploring PC2
+
+```{r}
+#| label: PC2 Min vs Mean Shape
+plotRefToTarget(PCA$shapes$shapes.comp2$min, meanshape,
+                method = "vector",
+                mag = 1)
+```
+
+```{r}
+#| label: PC2 Max vs Mean Shape
+plotRefToTarget(PCA$shapes$shapes.comp2$max, meanshape,
+                method = "vector",
+                mag = 1)
+```
+
+```{r}
+#| label: PC2 Min vs Max
+plotRefToTarget(PCA$shapes$shapes.comp2$min, PCA$shapes$shapes.comp2$max,
+                method = "vector",
+                mag = 1)
+```
+
+## Exploring PC3
+
+```{r}
+#| label: PC3 Min vs Mean Shape
+plotRefToTarget(PCA$shapes$shapes.comp3$min, PCA$shapes$shapes.comp3$max,
+                method = "vector",
+                mag = 1)
+```
+
+# 7. PCA with *Schleizius* and *Gracilis* holotypes
+
+```{r}
+#| label: Importing the landmarks
 bonus_TPS <- c("robin_conodonts.TPS", "schleiziusDzik_all.TPS", "gracilisDzik.TPS")
 bonus_landmarks <- readmulti.tps(filelist = bonus_TPS,
                                  readcurves = TRUE,
@@ -155,16 +236,19 @@ bonus_landmarks <- readmulti.tps(filelist = bonus_TPS,
 ```
 
 ```{r}
+#| label: Procrustes Superimposition
 bonus_landmarks.gpa <- gpagen(bonus_landmarks)
 plot(bonus_landmarks.gpa)
 ```
 
 ```{r}
+#| label: PCA & Selecting the holotypes for labels
 bonus_PCA <- gm.prcomp(bonus_landmarks.gpa$coords) 
 selected <- c(61, 62, 63, 64, 65)
 ```
 
 ```{r}
+#| label: PC1 and PC2
 plot(bonus_PCA$x[,1], bonus_PCA$x[,2],
      pch = 16,
      xlab = "PC 1",
@@ -182,8 +266,8 @@ text(x = bonus_PCA$x[,1][selected],
      )
 ```
 
-
 ```{r}
+#| label: PC3 and PC4
 plot(bonus_PCA$x[,3], bonus_PCA$x[,4],
      pch = 16,
      xlab = "PC 3",
@@ -200,9 +284,7 @@ text(x = bonus_PCA$x[,3][selected],
      )
 ```
 
-
-
-## PCA plots with relative ages
+# PCA plots with relative ages
 
 ```{r}
 age.colors <- colorRampPalette(c("orange","purple"))
@@ -243,13 +325,11 @@ heights <- read.csv(file = "BedHeights.csv",
                     header = T)
 ```
 
-
 ```{r}
 #| label: Extract bed name from file names
 sample_names <- gsub("\\D*","",dimnames(landmarks.gpa$coords)[[3]])
 sample_names <- as.numeric(sample_names)
 ```
-
 
 ```{r}
 #| label: match sample names with heights in section
@@ -260,7 +340,6 @@ Positions2 <- merge(x = sample_names,
       by.y = "Bed",
       all.x = T)
 ```
-
 
 ```{r}
 height.colors<-colorRampPalette(c("orange","purple"))
@@ -283,12 +362,12 @@ text(x = PCA$x[,1],
      cex = 0.7
      )
 ```
+
 There doesn't seem to be any link between PC1 or PC2 and the position in section.
 
 ```{r}
 model_height_pc1 <- procD.lm(PCA$x[,1] ~ Positions2$Height)
 ```
-
 
 ```{r}
 plot(Positions2$Height, PCA$x[,1], type = "p",
@@ -304,6 +383,7 @@ The heights might need some transformation (such as standardization).
 ```{r}
 summary(model_height_pc1)
 ```
+
 The relationship between PC1 and height in section is not significant. But, again, might need some transformation.
 
 ### Size of elements
@@ -316,7 +396,6 @@ for (i in 1:dim(landmarks.gpa$coords)[3]) {
   size[i] <- max(landmarks.gpa$coords[,1,i]) - min(landmarks.gpa$coords[,1,i])
 }
 ```
- 
 
 ```{r}
 my.colors<-colorRampPalette(c("red","blue"))
@@ -333,6 +412,7 @@ plot(PCA$x[,1], PCA$x[,2],
      main = "PCA of the platform outline of T. gracilis"
 )
 ```
+
 The size and colour of the points is proportional to the size of the element. There is clearly a correlation between size and PC1.
 
 ### Regression analysis
@@ -352,61 +432,5 @@ abline(a = model_pc1$coefficients[1],
 ```{r}
 summary(model_pc1)
 ```
+
 Even though there is a big scatter around the trend, PC1 decreases significantly with the length of the element. That suggests that specimens on the right side correspond to younger individuals.
-
-## Exploring shape variation across PC space
-
-### Mean shape of Tripodellus gracilis
-
-```{r}
-meanshape <- mshape(landmarks.gpa$coords)
-plot(meanshape)
-```
-
-### Exploring PC1
-
-#### PC1 Minimum against Mean Shape
-
-```{r}
-plotRefToTarget(PCA$shapes$shapes.comp1$min, meanshape)
-```
-
-#### PC1 Maximum against Mean Shape
-
-```{r}
-plotRefToTarget(PCA$shapes$shapes.comp1$max, meanshape, method = "vector")
-```
-
-#### PC1 Minimum against Maximum
-
-```{r}
-plotRefToTarget(PCA$shapes$shapes.comp1$min, PCA$shapes$shapes.comp1$max, method = "vector", mag=1)
-```
-
-### Exploring PC2
-
-#### PC2 Minimum against Mean Shape
-
-```{r}
-plotRefToTarget(PCA$shapes$shapes.comp2$min, method = "vector", meanshape)
-```
-
-#### PC2 Maximum against Mean Shape
-
-```{r}
-plotRefToTarget(PCA$shapes$shapes.comp2$max, meanshape, method = "vector")
-```
-
-#### PC2 Minimum against Maximum
-
-```{r}
-plotRefToTarget(PCA$shapes$shapes.comp2$min, PCA$shapes$shapes.comp2$max, method = "vector", mag = 1)
-```
-
-### Exploring PC3
-
-#### PC3 Minimum against Maximum
-
-```{r}
-plotRefToTarget(PCA$shapes$shapes.comp3$min, PCA$shapes$shapes.comp3$max, method = "vector", mag = 1)
-```
