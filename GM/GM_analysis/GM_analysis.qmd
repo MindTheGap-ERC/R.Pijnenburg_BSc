@@ -333,13 +333,13 @@ text(x = bonus_PCA$x[,3][selected],
 
 ```{r}
 age.colors <- colorRampPalette(c("orange","purple"))
-age.color.name <- age.colors(Positions$Age)
+age.color.name <- age.colors(positions$Age)
 
 plot(PCA$x[,1], PCA$x[,2],
      pch = 16,
-     bg = age.color.name[Positions$Age],
-     cex = scales::rescale(Positions$Age, to = c(0.6, 2)),
-     col = age.color.name[Positions$Age],
+     bg = age.color.name[positions$Age],
+     cex = scales::rescale(positions$Age, to = c(0.6, 2)),
+     col = age.color.name[positions$Age],
      xlab = "PC 1: 40.46%",
      ylab = "PC 2: 19.87%",
      main = expression("PC1 and PC2 of "*italic(T.~gracilis)*" shapes"),
@@ -351,9 +351,9 @@ plot(PCA$x[,1], PCA$x[,2],
 ```{r}
 plot(PCA$x[,3], PCA$x[,4],
      pch = 16,
-     bg = age.color.name[Positions$Age],
-     cex = scales::rescale(Positions$Age, to = c(0.6, 2)),
-     col = age.color.name[Positions$Age],
+     bg = age.color.name[positions$Age],
+     cex = scales::rescale(positions$Age, to = c(0.6, 2)),
+     col = age.color.name[positions$Age],
      xlab = "PC 3: 14.65%",
      ylab = "PC 4: 6.55%",
      main = expression("PC3 and PC4 of "*italic(T.~gracilis)*" shapes"),
@@ -371,7 +371,7 @@ heights <- read.csv(file = "BedHeights.csv",
 ```
 
 ```{r}
-#| label: Extract bed name from file names
+#| label: Extract bed name from file names 2
 sample_names <- gsub("\\D*","",dimnames(landmarks.gpa$coords)[[3]])
 sample_names <- as.numeric(sample_names)
 ```
