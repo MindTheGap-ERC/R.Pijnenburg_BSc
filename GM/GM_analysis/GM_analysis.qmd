@@ -10,13 +10,14 @@ execute:
 #| echo: FALSE
 require(geomorph)
 require(scales)
+require(ggplot2)
 ```
 
 # 1. Importing landmarks into R
 
 ```{r}
 #| warning: FALSE
-landmarks <- readland.tps(file="robin_conodonts.TPS",
+landmarks <- geomorph::readland.tps(file="robin_conodonts.TPS",
                           readcurves = TRUE,
                           specID = "imageID")
 ```
@@ -24,7 +25,7 @@ landmarks <- readland.tps(file="robin_conodonts.TPS",
 # 2. Procrustes analysis
 
 ```{r}
-landmarks.gpa<-gpagen(landmarks)
+landmarks.gpa<-geomorph::gpagen(landmarks)
 plot(landmarks.gpa)
 ```
 
@@ -34,7 +35,7 @@ Robin: if you want to connect the landmarks to create a shape, you will have to 
 
 ```{r}
 #| eval: FALSE
-landmarks.gpa$links <- define.links(landmarks.gpa$coords[,,1])
+landmarks.gpa$links <- geomorph::define.links(landmarks.gpa$coords[,,1])
 ```
 
 If you define the links, save your dataset directly into an R object, otherwise you have to re-run it:
@@ -50,7 +51,7 @@ See the dispersion between the specimens:
 
 ```{r}
 #| fig-cap: "Dispersion of landmarks across specimens"
-plotAllSpecimens(landmarks.gpa$coords,
+geomorph::plotAllSpecimens(landmarks.gpa$coords,
                  links = landmarks.gpa$links)
 ```
 
@@ -61,7 +62,7 @@ the `links = landmarks.gpa$links` line only works if you have defined the links
 ## PC1 and PC2
 
 ```{r}
-PCA <- gm.prcomp(landmarks.gpa$coords) 
+PCA <- geomorph::gm.prcomp(landmarks.gpa$coords) 
 plot(PCA, main = expression("PC1 and PC2 of "*italic(T.~gracilis)*" shapes"))
 ```
 
@@ -84,7 +85,6 @@ text(x = PCA$x[,1],
 ## PC3 and PC4
 
 ```{r}
-PCA <- gm.prcomp(landmarks.gpa$coords) 
 plot(PCA,
      axis1 = 3,
      axis2 = 4,
@@ -121,10 +121,10 @@ positions <- merge(x = sample_names,
 
 # 5. Change in PCs over time
 
-## Change in PC1 over time
+## 5.1 Linear regression: Change in PC1 over time
 
 ```{r}
-model_age_pc1 <- procD.lm(PCA$x[,1] ~ positions$Age)
+model_age_pc1 <- geomorph::procD.lm(PCA$x[,1] ~ positions$Age)
 ```
 
 ```{r}
@@ -139,7 +139,7 @@ abline(a = model_age_pc1$coefficients[1],
        col="blue")
 ```
 
-## Change in PC2 over time
+## 5.1 Linear regression: Change in PC2 over time
 
 ```{r}
 #| label: PC2
@@ -150,7 +150,7 @@ plot(positions$Age/1000, PCA$x[,2],
      ylab = "PC2")
 ```
 
-## Change in PC3 over time
+## 5.1 Linear regression: Change in PC3 over time
 
 ```{r}
 #| label: PC3
@@ -160,6 +160,51 @@ plot(positions$Age/1000, PCA$x[,3],
      xlab = "Relative Age (kyr)",
      ylab = "PC3")
 ```
+
+## 5.2 Mean change of shape across beds
+
+Create a list (`PC`) which contains two matrices: one for the means (`[[1]]`) and one for the standard deviations (`[[2]]`) per bed. Each row corresponds to one PC, so e.g. the value for the mean of PC3 in bed 213 can be accessed as follows: `PC[[1]][3,1]`
+
+```{r}
+#| label: means and SDs per bed of each PC
+Ages_PC <- cbind(PCA$x, positions)
+Ages_PC$sample_names <- as.factor(Ages_PC$sample_names)
+
+PC <- list("Mean" = matrix(nrow = dim(PCA$x)[2], 
+                           ncol = length(levels(Ages_PC$sample_names))),
+           "SD" = matrix(nrow = dim(PCA$x)[2],
+                          ncol = length(levels(Ages_PC$sample_names))))
+
+for (i in 1:dim(PCA$x)[2]) {
+  PC[[1]][i,] <- tapply(Ages_PC[,i], Ages_PC$sample_names, mean)
+  PC[[2]][i,] <- tapply(Ages_PC[,i], Ages_PC$sample_names, sd)
+}
+```
+
+```{r}
+#| label: plot means and SDs of PC1 per bed
+
+plot(
+  x = as.numeric(levels(Ages_PC$sample_names)),
+  y = PC[[1]][1,],
+  type = "l",
+  xlab="Sample number",
+  ylab="Mean value of PC1",
+  ylim = c(min(PC[[1]][1,] - PC[[2]][1,], na.rm = T),max(PC[[1]][1,] + PC[[2]][1,], na.rm = T))
+)
+
+for (i in length(levels(Ages_PC$sample_names))) {
+  segments(
+    x0 = as.numeric(levels(Ages_PC$sample_names)[i]),
+    x1 = as.numeric(levels(Ages_PC$sample_names)[i]),
+    y0 = PC[[1]][1,i] - PC[[2]][1,i],
+    y1 = PC[[1]][1,i] + PC[[2]][1,i],
+    col = "gray"
+  )
+}
+
+```
+
 
 # 6. Exploring shape variation across PC space
 
