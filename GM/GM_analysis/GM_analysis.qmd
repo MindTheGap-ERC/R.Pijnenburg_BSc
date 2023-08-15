@@ -121,10 +121,67 @@ positions <- merge(x = sample_names,
 
 # 5. Change in PCs over time
 
-## 5.1 Linear regression: Change in PC1 over time
+## 5.1 Mean change of shape across beds
+
+Create a list (`PC`) which contains two matrices: one for the means (`[[1]]`) and one for the standard deviations (`[[2]]`) per bed. Each row corresponds to one PC, so e.g. the value for the mean of PC3 in bed 213 can be accessed as follows: `PC[[1]][3,1]`
 
 ```{r}
-model_age_pc1 <- geomorph::procD.lm(PCA$x[,1] ~ positions$Age)
+#| label: means and SDs per bed of each PC
+Ages_PC <- cbind(PCA$x, positions)
+Ages_PC$Age <- as.factor(Ages_PC$Age)
+
+PC <- list("Mean" = matrix(nrow = dim(PCA$x)[2], 
+                           ncol = length(levels(Ages_PC$Age))),
+           "SD" = matrix(nrow = dim(PCA$x)[2],
+                          ncol = length(levels(Ages_PC$Age))))
+
+for (i in 1:dim(PCA$x)[2]) {
+  PC[[1]][i,] <- tapply(Ages_PC[,i], Ages_PC$Age, mean)
+  PC[[2]][i,] <- tapply(Ages_PC[,i], Ages_PC$Age, sd)
+}
+```
+
+## 5.2 Change in PC1 over time
+
+```{r}
+#| label: plot means and SDs of PC1
+
+plot(
+  x = as.numeric(levels(Ages_PC$Age))/1000,
+  y = PC[[1]][1,],
+  main = "Change in PC1 over time",
+  type = "l",
+  xlab="Relative Age (kyr)",
+  ylab="PC1",
+  yaxt="n",
+  ylim = c(min(PC[[1]][1,] - PC[[2]][1,], na.rm = T),max(PC[[1]][1,] + PC[[2]][1,], na.rm = T))
+)
+
+points(x = positions$Age/1000,
+       y = PCA$x[,1]
+       )
+
+arrows(x0 = as.numeric(levels(Ages_PC$Age))/1000,
+       x1 = as.numeric(levels(Ages_PC$Age))/1000,
+       y0 = PC[[1]][1,] - PC[[2]][1,],
+       y1 = PC[[1]][1,] + PC[[2]][1,],
+       code = 3,
+       angle = 90,
+       length = 0.05,
+       )
+
+```
+```{r}
+#| label: Leaving this here for now. It was originally in the same block as the mean PC over time plot.
+for (i in length(levels(Ages_PC$Age))) {
+  segments(
+    x0 = as.numeric(levels(Ages_PC$Age)[i]),
+    x1 = as.numeric(levels(Ages_PC$Age)[i]),
+    y0 = PC[[1]][1,i] - PC[[2]][1,i],
+    y1 = PC[[1]][1,i] + PC[[2]][1,i],
+    col = "gray"
+  )
+}
 ```
 
 ```{r}
@@ -134,12 +191,9 @@ plot(positions$Age/1000, PCA$x[,1],
      yaxt="n",
      xlab = "Relative Age (kyr)",
      ylab = "PC1")
-abline(a = model_age_pc1$coefficients[1], 
-       b = model_age_pc1$coefficients[2],
-       col="blue")
 ```
 
-## 5.1 Linear regression: Change in PC2 over time
+## 5.2 Change in PC2 over time
 
 ```{r}
 #| label: PC2
@@ -150,7 +204,7 @@ plot(positions$Age/1000, PCA$x[,2],
      ylab = "PC2")
 ```
 
-## 5.1 Linear regression: Change in PC3 over time
+## 5.2 Change in PC3 over time
 
 ```{r}
 #| label: PC3
@@ -160,51 +214,6 @@ plot(positions$Age/1000, PCA$x[,3],
      xlab = "Relative Age (kyr)",
      ylab = "PC3")
 ```
-
-## 5.2 Mean change of shape across beds
-
-Create a list (`PC`) which contains two matrices: one for the means (`[[1]]`) and one for the standard deviations (`[[2]]`) per bed. Each row corresponds to one PC, so e.g. the value for the mean of PC3 in bed 213 can be accessed as follows: `PC[[1]][3,1]`
-
-```{r}
-#| label: means and SDs per bed of each PC
-Ages_PC <- cbind(PCA$x, positions)
-Ages_PC$sample_names <- as.factor(Ages_PC$sample_names)
-
-PC <- list("Mean" = matrix(nrow = dim(PCA$x)[2], 
-                           ncol = length(levels(Ages_PC$sample_names))),
-           "SD" = matrix(nrow = dim(PCA$x)[2],
-                          ncol = length(levels(Ages_PC$sample_names))))
-
-for (i in 1:dim(PCA$x)[2]) {
-  PC[[1]][i,] <- tapply(Ages_PC[,i], Ages_PC$sample_names, mean)
-  PC[[2]][i,] <- tapply(Ages_PC[,i], Ages_PC$sample_names, sd)
-}
-```
-
-```{r}
-#| label: plot means and SDs of PC1 per bed
-
-plot(
-  x = as.numeric(levels(Ages_PC$sample_names)),
-  y = PC[[1]][1,],
-  type = "l",
-  xlab="Sample number",
-  ylab="Mean value of PC1",
-  ylim = c(min(PC[[1]][1,] - PC[[2]][1,], na.rm = T),max(PC[[1]][1,] + PC[[2]][1,], na.rm = T))
-)
-
-for (i in length(levels(Ages_PC$sample_names))) {
-  segments(
-    x0 = as.numeric(levels(Ages_PC$sample_names)[i]),
-    x1 = as.numeric(levels(Ages_PC$sample_names)[i]),
-    y0 = PC[[1]][1,i] - PC[[2]][1,i],
-    y1 = PC[[1]][1,i] + PC[[2]][1,i],
-    col = "gray"
-  )
-}
-
-```
-
 
 # 6. Exploring shape variation across PC space
 
