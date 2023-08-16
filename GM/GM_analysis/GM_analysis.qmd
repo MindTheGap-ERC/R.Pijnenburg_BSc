@@ -153,66 +153,90 @@ plot(
   type = "l",
   xlab="Relative Age (kyr)",
   ylab="PC1",
-  yaxt="n",
-  ylim = c(min(PC[[1]][1,] - PC[[2]][1,], na.rm = T),max(PC[[1]][1,] + PC[[2]][1,], na.rm = T))
+  yaxt = "n",
+  ylim = c(-0.08,0.08)
 )
 
-points(x = positions$Age/1000,
-       y = PCA$x[,1]
-       )
+points(
+  x = positions$Age/1000,
+  y = PCA$x[,1],
+  col = "red",
+)
 
-arrows(x0 = as.numeric(levels(Ages_PC$Age))/1000,
-       x1 = as.numeric(levels(Ages_PC$Age))/1000,
-       y0 = PC[[1]][1,] - PC[[2]][1,],
-       y1 = PC[[1]][1,] + PC[[2]][1,],
-       code = 3,
-       angle = 90,
-       length = 0.05,
-       )
-
-```
-```{r}
-#| label: Leaving this here for now. It was originally in the same block as the mean PC over time plot.
-for (i in length(levels(Ages_PC$Age))) {
-  segments(
-    x0 = as.numeric(levels(Ages_PC$Age)[i]),
-    x1 = as.numeric(levels(Ages_PC$Age)[i]),
-    y0 = PC[[1]][1,i] - PC[[2]][1,i],
-    y1 = PC[[1]][1,i] + PC[[2]][1,i],
-    col = "gray"
-  )
-}
-```
-
-```{r}
-#| label: PC1
-plot(positions$Age/1000, PCA$x[,1],
-     main = "Change in PC1 over time",
-     yaxt="n",
-     xlab = "Relative Age (kyr)",
-     ylab = "PC1")
+arrows(
+  x0 = as.numeric(levels(Ages_PC$Age))/1000,
+  x1 = as.numeric(levels(Ages_PC$Age))/1000,
+  y0 = PC[[1]][1,] - PC[[2]][1,],
+  y1 = PC[[1]][1,] + PC[[2]][1,],
+  code = 3,
+  angle = 90,
+  length = 0.05,
+)
 ```
 
 ## 5.2 Change in PC2 over time
 
-```{r}
-#| label: PC2
-plot(positions$Age/1000, PCA$x[,2],
-     main = "Change in PC2 over time",
-     yaxt="n",
-     xlab = "Relative Age (kyr)",
-     ylab = "PC2")
-```
 
+```{r}
+#| label: plot means and SDs of PC2
+
+plot(
+  x = as.numeric(levels(Ages_PC$Age))/1000,
+  y = PC[[1]][2,],
+  main = "Change in PC2 over time",
+  type = "l",
+  xlab="Relative Age (kyr)",
+  ylab="PC2",
+  yaxt = "n",
+  ylim = c(-0.08,0.08)
+)
+
+points(x = positions$Age/1000,
+       y = PCA$x[,2],
+       col = "red",
+)
+
+arrows(x0 = as.numeric(levels(Ages_PC$Age))/1000,
+       x1 = as.numeric(levels(Ages_PC$Age))/1000,
+       y0 = PC[[1]][2,] - PC[[2]][2,],
+       y1 = PC[[1]][2,] + PC[[2]][2,],
+       code = 3,
+       angle = 90,
+       length = 0.05,
+)
+
+```
 ## 5.2 Change in PC3 over time
 
 ```{r}
-#| label: PC3
-plot(positions$Age/1000, PCA$x[,3],
-     main = "Change in PC3 over time",
-     yaxt="n",
-     xlab = "Relative Age (kyr)",
-     ylab = "PC3")
+#| label: plot means and SDs of PC3
+
+plot(
+  x = as.numeric(levels(Ages_PC$Age))/1000,
+  y = PC[[1]][3,],
+  main = "Change in PC3 over time",
+  type = "l",
+  xlab="Relative Age (kyr)",
+  ylab="PC3",
+  yaxt = "n",
+  ylim = c(-0.08,0.08)
+)
+
+points(
+  x = positions$Age/1000,
+  y = PCA$x[,3],
+  col = "red",
+)
+
+arrows(
+  x0 = as.numeric(levels(Ages_PC$Age))/1000,
+  x1 = as.numeric(levels(Ages_PC$Age))/1000,
+  y0 = PC[[1]][3,] - PC[[2]][3,],
+  y1 = PC[[1]][3,] + PC[[2]][3,],
+  code = 3,
+  angle = 90,
+  length = 0.05,
+)
 ```
 
 # 6. Exploring shape variation across PC space
@@ -228,16 +252,22 @@ plot(meanshape)
 
 ```{r}
 #| label: PC1 Min vs Mean Shape
-plotRefToTarget(PCA$shapes$shapes.comp1$min, meanshape,
-                method = "vector",
-                mag = 1)
+plotRefToTarget(
+  meanshape,
+  PCA$shapes$shapes.comp1$min,
+  method = "vector",
+  mag = 1
+)
 ```
 
 ```{r}
 #| label: PC1 Max vs Mean Shape
-plotRefToTarget(PCA$shapes$shapes.comp1$max, meanshape,
-                method = "vector",
-                mag = 1)
+plotRefToTarget(
+  meanshape,
+  PCA$shapes$shapes.comp1$max,
+  method = "vector",
+  mag = 1
+)
 ```
 
 ```{r}
@@ -253,14 +283,14 @@ plotRefToTarget(PCA$shapes$shapes.comp1$min, PCA$shapes$shapes.comp1$max,
 #| label: PC2 Min vs Mean Shape
 plotRefToTarget(PCA$shapes$shapes.comp2$min, meanshape,
                 method = "vector",
-                mag = 1)
+                mag = 2)
 ```
 
 ```{r}
 #| label: PC2 Max vs Mean Shape
 plotRefToTarget(PCA$shapes$shapes.comp2$max, meanshape,
                 method = "vector",
-                mag = 1)
+                mag = 2)
 ```
 
 ```{r}
@@ -274,9 +304,16 @@ plotRefToTarget(PCA$shapes$shapes.comp2$min, PCA$shapes$shapes.comp2$max,
 
 ```{r}
 #| label: PC3 Min vs Mean Shape
-plotRefToTarget(PCA$shapes$shapes.comp3$min, PCA$shapes$shapes.comp3$max,
+plotRefToTarget(PCA$shapes$shapes.comp3$min, meanshape,
                 method = "vector",
-                mag = 1)
+                mag = 2)
+```
+
+```{r}
+#| label: PC3 Min vs Mean Shape
+plotRefToTarget(PCA$shapes$shapes.comp3$max, meanshape,
+                method = "vector",
+                mag = 2)
 ```
 
 # 7. PCA with *Schleizius* and *Gracilis* holotypes
@@ -488,3 +525,16 @@ summary(model_pc1)
 ```
 
 Even though there is a big scatter around the trend, PC1 decreases significantly with the length of the element. That suggests that specimens on the right side correspond to younger individuals.
+
+```{r}
+#| label: Leaving this here for now. It was originally in the same block as the mean PC over time plot.
+for (i in length(levels(Ages_PC$Age))) {
+  segments(
+    x0 = as.numeric(levels(Ages_PC$Age)[i]),
+    x1 = as.numeric(levels(Ages_PC$Age)[i]),
+    y0 = PC[[1]][1,i] - PC[[2]][1,i],
+    y1 = PC[[1]][1,i] + PC[[2]][1,i],
+    col = "gray"
+  )
+}
+```
