@@ -256,7 +256,7 @@ plotRefToTarget(
   meanshape,
   PCA$shapes$shapes.comp1$min,
   method = "vector",
-  mag = 1
+  mag = 2
 )
 ```
 
@@ -266,7 +266,7 @@ plotRefToTarget(
   meanshape,
   PCA$shapes$shapes.comp1$max,
   method = "vector",
-  mag = 1
+  mag = 2
 )
 ```
 
@@ -281,39 +281,52 @@ plotRefToTarget(PCA$shapes$shapes.comp1$min, PCA$shapes$shapes.comp1$max,
 
 ```{r}
 #| label: PC2 Min vs Mean Shape
-plotRefToTarget(PCA$shapes$shapes.comp2$min, meanshape,
-                method = "vector",
-                mag = 2)
+plotRefToTarget(
+  meanshape,
+  PCA$shapes$shapes.comp2$min,
+  method = "vector",
+  mag = 2
+)
 ```
 
 ```{r}
 #| label: PC2 Max vs Mean Shape
-plotRefToTarget(PCA$shapes$shapes.comp2$max, meanshape,
-                method = "vector",
-                mag = 2)
+plotRefToTarget(
+  meanshape,
+  PCA$shapes$shapes.comp2$max, 
+  method = "vector",
+  mag = 2)
 ```
 
 ```{r}
 #| label: PC2 Min vs Max
-plotRefToTarget(PCA$shapes$shapes.comp2$min, PCA$shapes$shapes.comp2$max,
-                method = "vector",
-                mag = 1)
+plotRefToTarget(
+  PCA$shapes$shapes.comp2$min,
+  PCA$shapes$shapes.comp2$max,
+  method = "vector",
+  mag = 1
+)
 ```
 
 ## Exploring PC3
 
 ```{r}
 #| label: PC3 Min vs Mean Shape
-plotRefToTarget(PCA$shapes$shapes.comp3$min, meanshape,
-                method = "vector",
-                mag = 2)
+plotRefToTarget(
+  meanshape, 
+  PCA$shapes$shapes.comp3$min,
+  method = "vector",
+  mag = 2
+)
 ```
 
 ```{r}
-#| label: PC3 Min vs Mean Shape
-plotRefToTarget(PCA$shapes$shapes.comp3$max, meanshape,
-                method = "vector",
-                mag = 2)
+#| label: PC3 Max vs Mean Shape
+plotRefToTarget(
+  meanshape,
+  PCA$shapes$shapes.comp3$max,
+  method = "vector",
+  mag = 2)
 ```
 
 # 7. PCA with *Schleizius* and *Gracilis* holotypes
