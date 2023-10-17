@@ -329,6 +329,15 @@ plotRefToTarget(
   mag = 2)
 ```
 
+```{r}
+#| label: PC3 Min vs Max Shape
+plotRefToTarget(
+  PCA$shapes$shapes.comp3$min,
+  PCA$shapes$shapes.comp3$max,
+  method = "vector",
+  mag = 1)
+```
+
 # 7. PCA with *Schleizius* and *Gracilis* holotypes
 
 ```{r}
@@ -470,7 +479,7 @@ text(x = PCA$x[,1],
 There doesn't seem to be any link between PC1 or PC2 and the position in section.
 
 ```{r}
-model_height_pc1 <- procD.lm(PCA$x[,1] ~ Positions2$Height)
+model_height_pc1 <- lm(PCA$x[,1] ~ Positions2$Height)
 ```
 
 ```{r}
