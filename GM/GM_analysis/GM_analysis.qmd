@@ -11,6 +11,7 @@ execute:
 require(geomorph)
 require(scales)
 require(ggplot2)
+library(tidyverse)
 ```
 
 # 1. Importing landmarks into R
@@ -35,14 +36,14 @@ Robin: if you want to connect the landmarks to create a shape, you will have to 
 
 ```{r}
 #| eval: FALSE
-landmarks.gpa$links <- geomorph::define.links(landmarks.gpa$coords[,,1])
+# landmarks.gpa$links <- geomorph::define.links(landmarks.gpa$coords[,,1])
 ```
 
 If you define the links, save your dataset directly into an R object, otherwise you have to re-run it:
 
 ```{r}
-#saveRDS(landmarks.gpa, file="landmarks.gpa.RData")
-landmarks.gpa <- readRDS(file="landmarks.gpa.RData")
+# saveRDS(landmarks.gpa, file="landmarks.gpa.RData")
+# landmarks.gpa <- readRDS(file="landmarks.gpa.RData")
 ```
 
 ## Plotting the landmarks prior to the Procrustes analysis
@@ -51,8 +52,8 @@ See the dispersion between the specimens:
 
 ```{r}
 #| fig-cap: "Dispersion of landmarks across specimens"
-geomorph::plotAllSpecimens(landmarks.gpa$coords,
-                 links = landmarks.gpa$links)
+# geomorph::plotAllSpecimens(landmarks.gpa$coords,
+#                  links = landmarks.gpa$links)
 ```
 
 the `links = landmarks.gpa$links` line only works if you have defined the links
@@ -68,18 +69,18 @@ plot(PCA, main = expression("PC1 and PC2 of "*italic(T.~gracilis)*" shapes"))
 
 ```{r}
 #| label: PC1 and PC2 with labels
-plot(PCA$x[,1], PCA$x[,2],
-     pch = 16,
-     xlab = "PC 1",
-     ylab = "PC 2",
-     main = expression("PC1 and PC2 of "*italic(T.~gracilis)*" shapes")
-)
-text(x = PCA$x[,1],
-     y = PCA$x[,2],
-     labels = dimnames(landmarks.gpa$coords)[[3]],
-     pos = 1,
-     cex = 0.7
-     )
+# plot(PCA$x[,1], PCA$x[,2],
+#      pch = 16,
+#      xlab = "PC 1",
+#      ylab = "PC 2",
+#      main = expression("PC1 and PC2 of "*italic(T.~gracilis)*" shapes")
+# )
+# text(x = PCA$x[,1],
+#      y = PCA$x[,2],
+#      labels = dimnames(landmarks.gpa$coords)[[3]],
+#      pos = 1,
+#      cex = 0.7
+#      )
 ```
 
 ## PC3 and PC4
@@ -97,10 +98,79 @@ plot(PCA,
 # 4. Assigning relative ages to the samples
 
 ```{r}
-#| label: Import relative age data
-age <- read.csv(file = "RelativeAges.csv",
-                 sep = ",",
-                 header = T)
+# import pixel coordinates (scaled to meters) from WebPlotDigitizer
+
+bedCoords <- read.csv(file = "BedCoordinates.csv")
+kyrCoords <- read.csv(file = "KyrCoordinates.csv")
+```
+
+```{r}
+# set all positions relative to Hangenberg Lower Boundary (HLB)
+
+bedHLB <- bedCoords[1,2]
+kyrHLB <- kyrCoords[14,2]
+
+bedCoords$FromHLB  <- (bedCoords$y - bedHLB) * -1
+kyrCoords$FromHLBx <- (kyrCoords$x - kyrHLB) * -1
+```
+
+```{r}
+# scale kyrCoords so that distance from KUB to HLB is same as in bedCoords
+
+bedKUB <- bedCoords[27,3]
+kyrKUB <- kyrCoords[2,3]
+
+scaleFactor       <- bedKUB / kyrKUB
+
+kyrCoords$FromHLB <- kyrCoords$FromHLBx * scaleFactor
+```
+
+```{r}
+# combine both tables, reorder rows in ascending distance from HLB, and remove duplicate KUB and HLB rows
+# "sp" = stratigraphic positions
+
+sp <- data.frame(points = c(bedCoords$point, kyrCoords$point), distance = c(bedCoords$FromHLB, kyrCoords$FromHLB))
+sp <- sp %>% arrange(distance)
+sp <- sp %>% distinct(points, distance, .keep_all = TRUE)
+```
+
+```{r}
+# calculate relative ages
+
+sp$distance <- sp$distance - sp[1,2]
+sp$age = NA
+
+kyrs_per_trans <- 100
+t              <- 0   # just a counter for the for-loop below
+
+for (i in 1:nrow(sp)) {
+  # adds 100 to each successive trans row
+  if (grepl("trans", sp$points[i])){   
+    sp[i,3] = 0 + t
+    t <- t + kyrs_per_trans
+  }
+  # calculates the relative age of each bed
+  else{
+    trans_index <- which(sp$points == "trans")
+    next_trans  <- min(trans_index[trans_index > i])
+    prev_trans  <- max(trans_index[trans_index < i])
+    sp[i,3] = kyrs_per_trans * sp[i,2] / (sp[next_trans,2] - sp[prev_trans,2])
+  }
+}
+```
+
+```{r}
+# make final relative ages table
+
+sp2     <- sp[!sp$points=="trans",]
+sp2$age <- sp2$age - sp[2,3]
+age     <- data.frame(bed = sp2$points, age = sp2$age)
+
+# and a table for just 100-kyr transitions (considered adding this to the plots but idk)
+
+sp3         <- sp[sp$points=="trans",]
+sp3$age     <- sp3$age - sp[2,3]
+transitions <- data.frame(transition = sp3$points, age = sp3$age)
 ```
 
 ```{r}
@@ -117,6 +187,15 @@ positions <- merge(x = sample_names,
       by.x = "sample_names",
       by.y = "Bed",
       all.x = T)
+```
+
+## original relative ages
+
+```{r}
+#| label: Import relative age data
+#age_OLD <- read.csv(file = "RelativeAges.csv",
+#                 sep = ",",
+#                 header = T)
 ```
 
 # 5. Change in PCs over time
@@ -141,7 +220,27 @@ for (i in 1:dim(PCA$x)[2]) {
 }
 ```
 
-## 5.2 Change in PC1 over time
+## 5.2 Linear Regression Analyses
+
+```{r}
+lm_pc1 <- lm(positions$Age/1000 ~ PCA$x[,1])
+
+summary(lm_pc1)
+```
+
+```{r}
+lm_pc2 <- lm(positions$Age/1000 ~ PCA$x[,2])
+
+summary(lm_pc2)
+```
+
+```{r}
+lm_pc3 <- lm(positions$Age/1000 ~ PCA$x[,3])
+
+summary(lm_pc3)
+```
+
+## 5.3 Change in PC1 over time
 
 ```{r}
 #| label: plot means and SDs of PC1
@@ -151,11 +250,22 @@ plot(
   y = PC[[1]][1,],
   main = "Change in PC1 over time",
   type = "l",
-  xlab="Relative Age (kyr)",
+  xlab="Relative Age (Myr)",
   ylab="PC1",
   yaxt = "n",
   ylim = c(-0.08,0.08)
 )
+
+#colors in the eccentricity cycles, but that might be kind of redundant
+#for (i in 1:(nrow(transitions))){
+#  if (i %% 2 != 0){
+#    rect(transitions[i,2], -1, transitions[i+1,2], 1,col=rgb(0,0,1,.133),border=NA)
+#  }
+#}
+
+abline(v=0, lty=2)
+
+text(-0.008, 0, labels = "Hangenberg Black Shale", srt="-270", cex=0.8)
 
 points(
   x = positions$Age/1000,
@@ -174,8 +284,7 @@ arrows(
 )
 ```
 
-## 5.2 Change in PC2 over time
-
+## 5.4 Change in PC2 over time
 
 ```{r}
 #| label: plot means and SDs of PC2
@@ -185,11 +294,15 @@ plot(
   y = PC[[1]][2,],
   main = "Change in PC2 over time",
   type = "l",
-  xlab="Relative Age (kyr)",
+  xlab="Relative Age (Myr)",
   ylab="PC2",
   yaxt = "n",
   ylim = c(-0.08,0.08)
 )
+
+abline(v=0, lty=2)
+
+text(-0.008, 0, labels = "Hangenberg Black Shale", srt="-270", cex=0.8)
 
 points(x = positions$Age/1000,
        y = PCA$x[,2],
@@ -206,7 +319,8 @@ arrows(x0 = as.numeric(levels(Ages_PC$Age))/1000,
 )
 
 ```
-## 5.2 Change in PC3 over time
+
+## 5.5 Change in PC3 over time
 
 ```{r}
 #| label: plot means and SDs of PC3
@@ -216,11 +330,15 @@ plot(
   y = PC[[1]][3,],
   main = "Change in PC3 over time",
   type = "l",
-  xlab="Relative Age (kyr)",
+  xlab="Relative Age (Myr)",
   ylab="PC3",
   yaxt = "n",
   ylim = c(-0.08,0.08)
 )
+
+abline(v=0, lty=2)
+
+text(-0.008, 0, labels = "Hangenberg Black Shale", srt="-270", cex=0.8)
 
 points(
   x = positions$Age/1000,
