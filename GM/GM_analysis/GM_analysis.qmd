@@ -114,15 +114,11 @@ bedCoords$FromHLB  <- (bedCoords$y - bedHLB) * -1
 kyrCoords$FromHLBx <- (kyrCoords$x - kyrHLB) * -1
 ```
 
-Scale kyrCoords so that distance from KUB to HLB is same as in `bedCoords`
+Scale kyrCoords so that distance from KUB to HLB is same as in `bedCoords`.
+`bedCoords[27,3] / kyrCoords[2,3]` is a scale factor used to transform the distance from HLB.
 
 ```{r}
-bedKUB <- bedCoords[27,3]
-kyrKUB <- kyrCoords[2,3]
-
-scaleFactor       <- bedKUB / kyrKUB
-
-kyrCoords$FromHLB <- kyrCoords$FromHLBx * scaleFactor
+kyrCoords$FromHLB <- kyrCoords$FromHLBx * (bedCoords[27,3] / kyrCoords[2,3])
 ```
 
 Combine both tables, reorder rows in ascending distance from HLB, and remove duplicate KUB and HLB rows
