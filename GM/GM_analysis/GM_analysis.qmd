@@ -101,8 +101,9 @@ Import positions of samples and 100-kyr eccentricity cycle transitions:
 
 Obtained from Dzik et al., 2022 and De Vleeschouwer et al., 2013, respectively, using WebPlotDigitizer.
 
--   The y column in `BedCoordinates.csv` is the relative vertical distance from the bottom of the figure in meters.
--   The x column in `KyrCoordinates.csv` is the relative horizontal distance from the left of the figure in meters.
+-   The y column in `BedCoordinates.csv` is the relative vertical distance of each point from the bottom of the figure.
+-   The x column in `KyrCoordinates.csv` is the relative horizontal distance of each point from the left of the figure.
+-   Units are in meters for both files. (WebPlotDigizer automatically converted pixel coordinates to meters using the scales provided on each figure.)
 
 ```{r}
 bedCoords <- read.csv(file = "BedCoordinates.csv")
