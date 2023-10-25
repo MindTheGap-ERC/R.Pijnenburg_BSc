@@ -97,14 +97,22 @@ plot(PCA,
 
 # 4. Assigning relative ages to the samples
 
-Import pixel coordinates (scaled to meters) from WebPlotDigitizer
+Import positions of samples and 100-kyr eccentricity cycle transitions:
+
+Obtained from Dzik et al., 2022 and De Vleeschouwer et al., 2013, respectively, using WebPlotDigitizer.
+
+-   The y column in `BedCoordinates.csv` is the relative vertical distance from the bottom of the figure in meters.
+-   The x column in `KyrCoordinates.csv` is the relative horizontal distance from the left of the figure in meters.
 
 ```{r}
 bedCoords <- read.csv(file = "BedCoordinates.csv")
 kyrCoords <- read.csv(file = "KyrCoordinates.csv")
 ```
 
-Set all positions relative to Hangenberg Lower Boundary (HLB)
+Set all positions in the x and y columns relative to the Hangenberg Lower Boundary (HLB):
+
+-   `bedHLB` is the relative vertical distance of the HLB from the bottom of the figure, which will be subtracted from all rows in its column to set all distances relative to HLB.
+-   `kyrHLB` is the relative horizontal distance of the HLB from the left of the figure, which will be subtracted from all rows in its column to set all distances relative to HLB.
 
 ```{r}
 bedHLB <- bedCoords[1,2]
@@ -114,30 +122,44 @@ bedCoords$FromHLB  <- (bedCoords$y - bedHLB) * -1
 kyrCoords$FromHLBx <- (kyrCoords$x - kyrHLB) * -1
 ```
 
-Scale kyrCoords so that distance from KUB to HLB is same as in `bedCoords`.
-`bedCoords[27,3] / kyrCoords[2,3]` is a scale factor used to transform the distance from HLB.
+The stratipgrahic section measured in Dzik et al., 2022 has a different thickness from the section measured in De Vleeschouwer et al., 2013.
+
+Transform the `kyrCoords` data so that the relative distances from the HLB are at the same scale as those in the `bedCoords` data:
+
+-   `bedCoords[27,3] / kyrCoords[2,3]` is a scale factor used to transform the distance from HLB.
 
 ```{r}
 kyrCoords$FromHLB <- kyrCoords$FromHLBx * (bedCoords[27,3] / kyrCoords[2,3])
 ```
 
-Combine both tables, reorder rows in ascending distance from HLB, and remove duplicate KUB and HLB rows
-`sp` = stratigraphic positions
+Both data frames should now have the same value for their `KUB` row in their `FromHLB` column.
+
+Combine both tables into a new table (`sp`), reorder the rows in `sp` in ascending distance from the HLB, and remove the duplicate KUB and HLB rows:
+
+-   `sp` = "stratigraphic positions"
 
 ```{r}
+# combine tables
 sp <- data.frame(points = c(bedCoords$point, kyrCoords$point), distance = c(bedCoords$FromHLB, kyrCoords$FromHLB))
+# reorder rows
 sp <- sp %>% arrange(distance)
+# remove duplicate rows
 sp <- sp %>% distinct(points, distance, .keep_all = TRUE)
 ```
 
-Calculate relative ages
+Calculate the relative ages of samples based on their position between 100-kyr eccentricity cycle transitions:
+
+-   `kyrs_per_trans * sp[i,2] / (sp[next_trans,2] - sp[prev_trans,2])` is the formula used to calculate the relative age of a sample row.
 
 ```{r}
-sp$distance <- sp$distance - sp[1,2]
-sp$age = NA
-
 kyrs_per_trans <- 100
 t              <- 0   # just a counter for the for-loop below
+
+# set distances relative to the first cycle transition (temporarily)
+sp$distance <- sp$distance - sp[1,2]
+
+# initialize a new "age" column to be populated
+sp$age = NA
 
 for (i in 1:nrow(sp)) {
   # adds 100 to each successive trans row
@@ -155,9 +177,9 @@ for (i in 1:nrow(sp)) {
 }
 ```
 
-```{r}
-# make final relative ages table
+Make a new table (`age`) with only the age of each sample relative to the HLB:
 
+```{r}
 sp2     <- sp[!sp$points=="trans",]
 sp2$age <- sp2$age - sp[2,3]
 age     <- data.frame(bed = sp2$points, age = sp2$age)
@@ -168,6 +190,8 @@ sp3         <- sp[sp$points=="trans",]
 sp3$age     <- sp3$age - sp[2,3]
 transitions <- data.frame(transition = sp3$points, age = sp3$age)
 ```
+
+Use the `age` table to assign relative ages to the `landmarks.gpa` samples:
 
 ```{r}
 #| label: Extract bed name from file names
@@ -181,11 +205,11 @@ sample_names <- data.frame(sample_names)
 positions <- merge(x = sample_names,
       y = age,
       by.x = "sample_names",
-      by.y = "Bed",
+      by.y = "bed",
       all.x = T)
 ```
 
-## original relative ages
+## Original relative ages (calculations done in excel)
 
 ```{r}
 #| label: Import relative age data
