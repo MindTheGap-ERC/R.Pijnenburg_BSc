@@ -97,16 +97,16 @@ plot(PCA,
 
 # 4. Assigning relative ages to the samples
 
-```{r}
-# import pixel coordinates (scaled to meters) from WebPlotDigitizer
+Import pixel coordinates (scaled to meters) from WebPlotDigitizer
 
+```{r}
 bedCoords <- read.csv(file = "BedCoordinates.csv")
 kyrCoords <- read.csv(file = "KyrCoordinates.csv")
 ```
 
-```{r}
-# set all positions relative to Hangenberg Lower Boundary (HLB)
+Set all positions relative to Hangenberg Lower Boundary (HLB)
 
+```{r}
 bedHLB <- bedCoords[1,2]
 kyrHLB <- kyrCoords[14,2]
 
@@ -114,9 +114,9 @@ bedCoords$FromHLB  <- (bedCoords$y - bedHLB) * -1
 kyrCoords$FromHLBx <- (kyrCoords$x - kyrHLB) * -1
 ```
 
-```{r}
-# scale kyrCoords so that distance from KUB to HLB is same as in bedCoords
+Scale kyrCoords so that distance from KUB to HLB is same as in `bedCoords`
 
+```{r}
 bedKUB <- bedCoords[27,3]
 kyrKUB <- kyrCoords[2,3]
 
@@ -125,18 +125,18 @@ scaleFactor       <- bedKUB / kyrKUB
 kyrCoords$FromHLB <- kyrCoords$FromHLBx * scaleFactor
 ```
 
-```{r}
-# combine both tables, reorder rows in ascending distance from HLB, and remove duplicate KUB and HLB rows
-# "sp" = stratigraphic positions
+Combine both tables, reorder rows in ascending distance from HLB, and remove duplicate KUB and HLB rows
+`sp` = stratigraphic positions
 
+```{r}
 sp <- data.frame(points = c(bedCoords$point, kyrCoords$point), distance = c(bedCoords$FromHLB, kyrCoords$FromHLB))
 sp <- sp %>% arrange(distance)
 sp <- sp %>% distinct(points, distance, .keep_all = TRUE)
 ```
 
-```{r}
-# calculate relative ages
+Calculate relative ages
 
+```{r}
 sp$distance <- sp$distance - sp[1,2]
 sp$age = NA
 
