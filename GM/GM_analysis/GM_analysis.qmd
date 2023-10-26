@@ -12,6 +12,8 @@ require(geomorph)
 require(scales)
 require(ggplot2)
 library(tidyverse)
+library(png)
+library(grid)
 ```
 
 # 1. Importing landmarks into R
@@ -243,17 +245,23 @@ for (i in 1:dim(PCA$x)[2]) {
 
 ## 5.2 Linear Regression Analyses
 
+**PC1**
+
 ```{r}
 lm_pc1 <- lm(positions$Age/1000 ~ PCA$x[,1])
 
 summary(lm_pc1)
 ```
 
+**PC2**
+
 ```{r}
 lm_pc2 <- lm(positions$Age/1000 ~ PCA$x[,2])
 
 summary(lm_pc2)
 ```
+
+**PC3**
 
 ```{r}
 lm_pc3 <- lm(positions$Age/1000 ~ PCA$x[,3])
@@ -292,6 +300,7 @@ points(
   x = positions$Age/1000,
   y = PCA$x[,1],
   col = "red",
+  pch = 20
 )
 
 arrows(
@@ -322,14 +331,15 @@ plot(
   col = "black",
 )
 
-# plot_image(
-#   PC1_vector_min_1.png,
-#   type = image
-# )
-
 abline(v=0, lty=2)
 
 text(-0.008, 0, labels = "Hangenberg Black Shale", srt="-270", cex=0.8)
+
+points(x = positions$Age/1000,
+       y = PCA$x[,2],
+       col = "red",
+       pch = 20
+)
 
 arrows(x0 = as.numeric(levels(Ages_PC$Age))/1000,
        x1 = as.numeric(levels(Ages_PC$Age))/1000,
@@ -340,13 +350,6 @@ arrows(x0 = as.numeric(levels(Ages_PC$Age))/1000,
        length = 0.05,
        col = "black",
 )
-
-points(x = positions$Age/1000,
-       y = PCA$x[,2],
-       col = "red",
-       pch = 20
-)
-
 ```
 
 ## 5.5 Change in PC3 over time
@@ -373,6 +376,7 @@ points(
   x = positions$Age/1000,
   y = PCA$x[,3],
   col = "red",
+  pch = 20
 )
 
 arrows(
