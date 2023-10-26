@@ -183,7 +183,7 @@ Make a new table (`age`) with only the age of each sample relative to the HLB:
 ```{r}
 sp2     <- sp[!sp$points=="trans",]
 sp2$age <- sp2$age - sp[2,3]
-age     <- data.frame(bed = sp2$points, age = sp2$age)
+age     <- data.frame(Bed = sp2$points, Age = sp2$age)
 
 # and a table for just 100-kyr transitions (considered adding this to the plots but idk)
 
@@ -206,7 +206,7 @@ sample_names <- data.frame(sample_names)
 positions <- merge(x = sample_names,
       y = age,
       by.x = "sample_names",
-      by.y = "bed",
+      by.y = "Bed",
       all.x = T)
 ```
 
@@ -267,12 +267,12 @@ summary(lm_pc3)
 #| label: plot means and SDs of PC1
 
 plot(
-  x = as.numeric(levels(Ages_PC$Age))/1000,
-  y = PC[[1]][1,],
+  x    = as.numeric(levels(Ages_PC$Age))/1000,
+  y    = PC[[1]][1,],
   main = "Change in PC1 over time",
   type = "l",
-  xlab="Relative Age (Myr)",
-  ylab="PC1",
+  xlab = "Relative Age (Myr)",
+  ylab = "PC1",
   yaxt = "n",
   ylim = c(-0.08,0.08)
 )
@@ -318,17 +318,18 @@ plot(
   xlab="Relative Age (Myr)",
   ylab="PC2",
   yaxt = "n",
-  ylim = c(-0.08,0.08)
+  ylim = c(-0.08,0.08),
+  col = "black",
 )
+
+# plot_image(
+#   PC1_vector_min_1.png,
+#   type = image
+# )
 
 abline(v=0, lty=2)
 
 text(-0.008, 0, labels = "Hangenberg Black Shale", srt="-270", cex=0.8)
-
-points(x = positions$Age/1000,
-       y = PCA$x[,2],
-       col = "red",
-)
 
 arrows(x0 = as.numeric(levels(Ages_PC$Age))/1000,
        x1 = as.numeric(levels(Ages_PC$Age))/1000,
@@ -337,6 +338,13 @@ arrows(x0 = as.numeric(levels(Ages_PC$Age))/1000,
        code = 3,
        angle = 90,
        length = 0.05,
+       col = "black",
+)
+
+points(x = positions$Age/1000,
+       y = PCA$x[,2],
+       col = "red",
+       pch = 20
 )
 
 ```
