@@ -32,7 +32,7 @@ vignettes/*.pdf
 *.docx
 *.html
 *.pdf
-
+*.png
 
 # knitr and R markdown default cache directories
 *_cache/

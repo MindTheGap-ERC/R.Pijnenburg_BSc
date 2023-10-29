@@ -34,18 +34,17 @@ plot(landmarks.gpa)
 
 ## Adding links between landmarks (optional)
 
-Robin: if you want to connect the landmarks to create a shape, you will have to click pairs of landmarks (only once per analysis). This is triggered by the following command. Only run it if you are ready to click through all the pairs of landmarks ;-)
-
 ```{r}
 #| eval: FALSE
-# landmarks.gpa$links <- geomorph::define.links(landmarks.gpa$coords[,,1])
+landmarks.gpa$links <- geomorph::define.links(landmarks.gpa$coords[,,1])
 ```
 
 If you define the links, save your dataset directly into an R object, otherwise you have to re-run it:
 
 ```{r}
-# saveRDS(landmarks.gpa, file="landmarks.gpa.RData")
-# landmarks.gpa <- readRDS(file="landmarks.gpa.RData")
+#| eval: FALSE
+saveRDS(landmarks.gpa, file="landmarks.gpa.RData")
+landmarks.gpa <- readRDS(file="landmarks.gpa.RData")
 ```
 
 ## Plotting the landmarks prior to the Procrustes analysis
@@ -53,9 +52,10 @@ If you define the links, save your dataset directly into an R object, otherwise 
 See the dispersion between the specimens:
 
 ```{r}
+#| eval: FALSE
 #| fig-cap: "Dispersion of landmarks across specimens"
-# geomorph::plotAllSpecimens(landmarks.gpa$coords,
-#                  links = landmarks.gpa$links)
+geomorph::plotAllSpecimens(landmarks.gpa$coords,
+                 links = landmarks.gpa$links)
 ```
 
 the `links = landmarks.gpa$links` line only works if you have defined the links
@@ -69,20 +69,20 @@ PCA <- geomorph::gm.prcomp(landmarks.gpa$coords)
 plot(PCA, main = expression("PC1 and PC2 of "*italic(T.~gracilis)*" shapes"))
 ```
 
-```{r}
+```{{r}}
 #| label: PC1 and PC2 with labels
-# plot(PCA$x[,1], PCA$x[,2],
-#      pch = 16,
-#      xlab = "PC 1",
-#      ylab = "PC 2",
-#      main = expression("PC1 and PC2 of "*italic(T.~gracilis)*" shapes")
-# )
-# text(x = PCA$x[,1],
-#      y = PCA$x[,2],
-#      labels = dimnames(landmarks.gpa$coords)[[3]],
-#      pos = 1,
-#      cex = 0.7
-#      )
+plot(PCA$x[,1], PCA$x[,2],
+     pch = 16,
+     xlab = "PC 1",
+     ylab = "PC 2",
+     main = expression("PC1 and PC2 of "*italic(T.~gracilis)*" shapes")
+)
+text(x = PCA$x[,1],
+     y = PCA$x[,2],
+     labels = dimnames(landmarks.gpa$coords)[[3]],
+     pos = 1,
+     cex = 0.7
+     )
 ```
 
 ## PC3 and PC4
@@ -214,11 +214,11 @@ positions <- merge(x = sample_names,
 
 ## Original relative ages (calculations done in excel)
 
-```{r}
+```{{r}}
 #| label: Import relative age data
-#age_OLD <- read.csv(file = "RelativeAges.csv",
-#                 sep = ",",
-#                 header = T)
+age_OLD <- read.csv(file = "RelativeAges.csv",
+                sep = ",",
+                header = T)
 ```
 
 # 5. Change in PCs over time
@@ -285,13 +285,6 @@ plot(
   ylim = c(-0.08,0.08)
 )
 
-#colors in the eccentricity cycles, but that might be kind of redundant
-#for (i in 1:(nrow(transitions))){
-#  if (i %% 2 != 0){
-#    rect(transitions[i,2], -1, transitions[i+1,2], 1,col=rgb(0,0,1,.133),border=NA)
-#  }
-#}
-
 abline(v=0, lty=2)
 
 text(-0.008, 0, labels = "Hangenberg Black Shale", srt="-270", cex=0.8)
@@ -312,6 +305,15 @@ arrows(
   angle = 90,
   length = 0.05,
 )
+```
+
+``` {{r}}
+#colors in the eccentricity cycles, but that might be kind of redundant
+for (i in 1:(nrow(transitions))){
+  if (i %% 2 != 0){
+    rect(transitions[i,2], -1, transitions[i+1,2], 1,col=rgb(0,0,1,.133),border=NA)
+  }
+}
 ```
 
 ## 5.4 Change in PC2 over time
