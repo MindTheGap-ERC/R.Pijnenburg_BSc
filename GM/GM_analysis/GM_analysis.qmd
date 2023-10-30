@@ -12,8 +12,6 @@ require(geomorph)
 require(scales)
 require(ggplot2)
 library(tidyverse)
-library(png)
-library(grid)
 ```
 
 # 1. Importing landmarks into R
@@ -307,6 +305,7 @@ arrows(
 )
 ```
 
+````         
 ``` {{r}}
 #colors in the eccentricity cycles, but that might be kind of redundant
 for (i in 1:(nrow(transitions))){
@@ -315,6 +314,7 @@ for (i in 1:(nrow(transitions))){
   }
 }
 ```
+````
 
 ## 5.4 Change in PC2 over time
 
