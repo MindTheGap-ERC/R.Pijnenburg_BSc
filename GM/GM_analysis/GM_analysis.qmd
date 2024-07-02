@@ -12,6 +12,7 @@ require(geomorph)
 require(scales)
 require(ggplot2)
 library(tidyverse)
+library(orcutt)
 ```
 
 # 1. Importing landmarks into R
@@ -241,14 +242,30 @@ for (i in 1:dim(PCA$x)[2]) {
 }
 ```
 
-## 5.2 Linear Regression Analyses
+## 5.2 Cochrane-Orcutt Procedure
 
 **PC1**
 
 ```{r}
-lm_pc1 <- lm(positions$Age/1000 ~ PCA$x[,1])
 
-summary(lm_pc1)
+# make data frame of mean PC values and their ages
+
+mean1 <- data.frame(x = as.numeric(levels(Ages_PC$Age))/1000,
+                    y = PC[[1]][1,])
+
+# interpolate to equidistant points
+
+int1 = approx(mean1$x, mean1$y, xout=seq(0, 0.6, by=0.02))
+
+# make a linear model for the cochrane-orcutt estimation
+
+lm1 <- lm(y ~ x, data = mean1)
+
+# cochrane-orcutt estimation
+
+coch1 <- cochrane.orcutt(lm1)
+summary(coch1)
+
 ```
 
 **PC2**
